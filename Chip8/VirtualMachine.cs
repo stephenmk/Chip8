@@ -84,6 +84,20 @@ public class VirtualMachine
         rom.CopyTo(Memory, RomStart);
     }
 
+    public MachineState Snapshot() => new()
+    {
+        OpCode = OpCode,
+        I = I,
+        PC = PC,
+        Stack = Stack.AsSpan(),
+        SP = SP,
+        DelayTimer = DelayTimer,
+        SoundTimer = SoundTimer,
+        V = V.AsSpan(),
+        Memory = Memory.AsSpan(),
+        Screen = Screen.AsSpan(),
+    };
+
     public void Reset()
     {
         PC = RomStart;
