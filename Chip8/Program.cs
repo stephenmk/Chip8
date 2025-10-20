@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Threading;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.Common;
 

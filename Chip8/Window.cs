@@ -176,7 +176,8 @@ public class Window : GameWindow, IWindow
             if (!playingSound)
             {
                 playingSound = true;
-                Console.Beep(440, 500);
+                if (OperatingSystem.IsWindows())
+                    Console.Beep(440, 500);
                 playingSound = false;
             }
         });

@@ -590,8 +590,8 @@ public class Vm
     {
         var number = V[X];
         Memory[I] = (byte)(number / 100);
-        Memory[I + 1] = (byte)((number / 10) % 10);
-        Memory[I + 2] = (byte)((number % 100) % 10);
+        Memory[I + 1] = (byte)(number / 10 % 10);
+        Memory[I + 2] = (byte)(number % 100 % 10);
     }
 
     private void OpCode9XY0(byte X, byte Y)
