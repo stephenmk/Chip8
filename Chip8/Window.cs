@@ -1,12 +1,9 @@
-﻿using OpenTK.Windowing.Desktop;
-using OpenTK.Windowing.Common;
-using OpenTK.Input;
-using OpenTK.Windowing.Common.Input;
-using OpenTK.Graphics.OpenGL;
-using OpenTK.Windowing.GraphicsLibraryFramework;
-using OpenTK.Mathematics;
+﻿using System.ComponentModel;
 using System.Drawing;
-using System.ComponentModel;
+using OpenTK.Graphics.OpenGL;
+using OpenTK.Windowing.Common;
+using OpenTK.Windowing.Desktop;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace Chip8;
 
@@ -19,9 +16,8 @@ public class Window : GameWindow, IVmWindow
     public Window(GameWindowSettings gameSettings, NativeWindowSettings nativeSettings)
         : base(gameSettings, nativeSettings) { }
 
-    public void Render()
+    public void Render(IList<byte> buffer)
     {
-        var buffer = _virtualMachine?.Gfx;
         if (buffer != null)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit);
@@ -74,7 +70,6 @@ public class Window : GameWindow, IVmWindow
     protected override void OnKeyUp(KeyboardKeyEventArgs e)
     {
         base.OnKeyUp(e);
-
         if (KeyToByte(e.Key) is byte value)
         {
             _virtualMachine?.KeyUp(value);

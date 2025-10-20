@@ -44,7 +44,11 @@ public class VirtualMachine
     private byte _delayTimer;
     private byte _soundTimer;
 
+    /// <summary>
+    /// Variables (16 available, 0 to F)
+    /// </summary>
     public byte[] V { get; set; }
+
     public byte[] Memory { get; set; }
     public byte[] Gfx { get; set; }
 
@@ -112,11 +116,11 @@ public class VirtualMachine
         OpCode = (ushort)(Memory[PC] << 8 | Memory[PC + 1]);
         PC += 2;
 
-        ushort NNN = (ushort)(OpCode & 0x0FFF);   // Address
-        byte NN = (byte)(OpCode & 0x00FF);        // 8-bit constant
-        byte N = (byte)(OpCode & 0x000F);         // 4-bit constant
-        byte X = (byte)((OpCode & 0x0F00) >> 8);  // 4-bit register identifier
-        byte Y = (byte)((OpCode & 0x00F0) >> 4);  // 4-bit register identifier
+        ushort nnn = (ushort)(OpCode & 0x0FFF);   // Address
+        byte nn = (byte)(OpCode & 0x00FF);        // 8-bit constant
+        byte n = (byte)(OpCode & 0x000F);         // 4-bit constant
+        byte x = (byte)((OpCode & 0x0F00) >> 8);  // 4-bit register identifier
+        byte y = (byte)((OpCode & 0x00F0) >> 4);  // 4-bit register identifier
 
         switch (OpCode & 0xF000)
         {
@@ -127,115 +131,113 @@ public class VirtualMachine
                 OpCode00EE();
                 break;
             case 0x0000:
-                OpCode0NNN(NNN);
+                OpCode0NNN(nnn);
                 break;
             case 0x1000:
-                OpCode1NNN(NNN);
+                OpCode1NNN(nnn);
                 break;
             case 0x2000:
-                OpCode2NNN(NNN);
+                OpCode2NNN(nnn);
                 break;
             case 0x3000:
-                OpCode3XNN(X, NN);
+                OpCode3XNN(x, nn);
                 break;
             case 0x4000:
-                OpCode4XNN(X, NN);
+                OpCode4XNN(x, nn);
                 break;
             case 0x5000:
-                OpCode5XNN(X, Y);
+                OpCode5XY0(x, y);
                 break;
             case 0x6000:
-                OpCode6XNN(X, NN);
+                OpCode6XNN(x, nn);
                 break;
             case 0x7000:
-                OpCode7XNN(X, NN);
+                OpCode7XNN(x, nn);
                 break;
             case 0x8000 when (OpCode & 0x000F) == 0:
-                OpCode8XY0(X, Y);
+                OpCode8XY0(x, y);
                 break;
             case 0x8000 when (OpCode & 0x000F) == 1:
-                OpCode8XY1(X, Y);
+                OpCode8XY1(x, y);
                 break;
             case 0x8000 when (OpCode & 0x000F) == 2:
-                OpCode8XY2(X, Y);
+                OpCode8XY2(x, y);
                 break;
             case 0x8000 when (OpCode & 0x000F) == 3:
-                OpCode8XY3(X, Y);
+                OpCode8XY3(x, y);
                 break;
             case 0x8000 when (OpCode & 0x000F) == 4:
-                OpCode8XY4(X, Y);
+                OpCode8XY4(x, y);
                 break;
             case 0x8000 when (OpCode & 0x000F) == 5:
-                OpCode8XY5(X, Y);
+                OpCode8XY5(x, y);
                 break;
             case 0x8000 when (OpCode & 0x000F) == 6:
-                OpCode8XY6(X, Y);
+                OpCode8XY6(x, y);
                 break;
             case 0x8000 when (OpCode & 0x000F) == 7:
-                OpCode8XY7(X, Y);
+                OpCode8XY7(x, y);
                 break;
             case 0x8000 when (OpCode & 0x000F) == 0xE:
-                OpCode8XYE(X, Y);
+                OpCode8XYE(x, y);
                 break;
             case 0x9000:
-                OpCode9XY0(X, Y);
+                OpCode9XY0(x, y);
                 break;
             case 0xA000:
-                OpCodeANNN(NNN);
+                OpCodeANNN(nnn);
                 break;
             case 0xB000:
-                OpCodeBNNN(NNN);
+                OpCodeBNNN(nnn);
                 break;
             case 0xC000:
-                OpCodeCXNN(X, NN);
+                OpCodeCXNN(x, nn);
                 break;
             case 0xD000:
-                OpCodeDXYN(X, Y, N);
+                OpCodeDXYN(x, y, n);
                 break;
             case 0xE000 when (OpCode & 0x00FF) == 0x9E:
-                OpCodeEX9E(X);
+                OpCodeEX9E(x);
                 break;
             case 0xE000 when (OpCode & 0x00FF) == 0xA1:
-                OpCodeEXA1(X);
+                OpCodeEXA1(x);
                 break;
             case 0xF000 when (OpCode & 0x00FF) == 0x07:
-                OpCodeFX07(X);
+                OpCodeFX07(x);
                 break;
             case 0xF000 when (OpCode & 0x00FF) == 0x0A:
-                OpCodeFX0A(X);
+                OpCodeFX0A(x);
                 break;
             case 0xF000 when (OpCode & 0x00FF) == 0x15:
-                OpCodeFX15(X);
+                OpCodeFX15(x);
                 break;
             case 0xF000 when (OpCode & 0x00FF) == 0x18:
-                OpCodeFX18(X);
+                OpCodeFX18(x);
                 break;
             case 0xF000 when (OpCode & 0x00FF) == 0x1E:
-                OpCodeFX1E(X);
+                OpCodeFX1E(x);
                 break;
             case 0xF000 when (OpCode & 0x00FF) == 0x29:
-                OpCodeFX29(X);
+                OpCodeFX29(x);
                 break;
             case 0xF000 when (OpCode & 0x00FF) == 0x33:
-                OpCodeFX33(X);
+                OpCodeFX33(x);
                 break;
             case 0xF000 when (OpCode & 0x00FF) == 0x55:
-                OpCodeFX55(X);
+                OpCodeFX55(x);
                 break;
             case 0xF000 when (OpCode & 0x00FF) == 0x65:
-                OpCodeFX65(X);
+                OpCodeFX65(x);
                 break;
             default:
-                throw new InvalidOperationException($"error: Invalid OpCode: {OpCode:X4} @ PC = 0x{PC:X3}");
+                throw new InvalidOperationException($"Invalid OpCode {OpCode:X4} @ PC = 0x{PC:X3}");
         }
 
         // The update frequency is 600 Hz. Timers should be updated at 60 Hz, so update timers every 10th cycle.
-        if ((_counter % 10) == 0)
+        if ((_counter++ % 10) == 0)
         {
             UpdateTimers();
         }
-
-        _counter++;
     }
 
     private void UpdateTimers()
@@ -375,7 +377,12 @@ public class VirtualMachine
         V[x] = (byte)nn;
     }
 
-    // Source: https://stackoverflow.com/questions/17346592/how-does-chip-8-graphics-rendered-on-screen
+    /// <summary>
+    /// Draws a sprite at coordinate (Vx, Vy) that has a width of 8 pixels and a height of N pixels.
+    /// </summary>
+    /// <remarks>
+    /// Source: https://stackoverflow.com/questions/17346592/how-does-chip-8-graphics-rendered-on-screen
+    /// </remarks>
     private void OpCodeDXYN(byte X, byte Y, byte N)
     {
         // Initialize the collision detection as no collision detected (yet).
@@ -414,7 +421,7 @@ public class VirtualMachine
             }
         }
 
-        _window?.Render();
+        _window?.Render(Gfx);
     }
 
     /// <summary>
@@ -434,8 +441,11 @@ public class VirtualMachine
     }
 
     /// <summary>
-    /// Skips the next instruction if Vx equals NN (usually the next instruction is a jump to skip a code block).
+    /// Skips the next instruction if Vx equals NN.
     /// </summary>
+    /// <remarks>
+    /// Usually the next instruction is a jump to skip a code block.
+    /// </remarks>
     private void OpCode3XNN(byte x, ushort nn)
     {
         if (V[x] == nn)
@@ -444,6 +454,12 @@ public class VirtualMachine
         }
     }
 
+    /// <summary>
+    /// Skips the next instruction if Vx does not equal NN.
+    /// </summary>
+    /// <remarks>
+    /// Usually the next instruction is a jump to skip a code block.
+    /// </remarks>
     private void OpCode4XNN(byte x, ushort nn)
     {
         if (V[x] != nn)
@@ -452,7 +468,13 @@ public class VirtualMachine
         }
     }
 
-    private void OpCode5XNN(byte x, byte y)
+    /// <summary>
+    /// Skips the next instruction if Vx equals Vy.
+    /// </summary>
+    /// <remarks>
+    /// Usually the next instruction is a jump to skip a code block.
+    /// </remarks>
+    private void OpCode5XY0(byte x, byte y)
     {
         if (V[x] == V[y])
         {
@@ -460,43 +482,67 @@ public class VirtualMachine
         }
     }
 
+    /// <summary>
+    /// Sets Vx to the value of Vy.
+    /// </summary>
     private void OpCode8XY0(byte x, byte y)
     {
         V[x] = V[y];
     }
 
+    /// <summary>
+    /// Sets Vx to Vx or Vy (bitwise OR operation).
+    /// </summary>
     private void OpCode8XY1(byte x, byte y)
     {
         V[x] = (byte)(V[x] | V[y]);
     }
 
+    /// <summary>
+    /// Sets Vx to Vx and Vy (bitwise AND operation).
+    /// </summary>
     private void OpCode8XY2(byte x, byte y)
     {
         V[x] = (byte)(V[x] & V[y]);
     }
 
+    /// <summary>
+    /// Sets Vx to Vx xor Vy.
+    /// </summary>
     private void OpCode8XY3(byte x, byte y)
     {
         V[x] = (byte)(V[x] ^ V[y]);
     }
 
+    /// <summary>
+    /// Adds Vy to Vx. VF is set to 1 when there's an overflow, and to 0 when there is not.
+    /// </summary>
     private void OpCode8XY4(byte x, byte y)
     {
         if (V[y] > (0xFF - V[x]))
+        {
             V[0xF] = 1;
+        }
         else
+        {
             V[0xF] = 0;
-
+        }
         V[x] += V[y];
     }
 
+    /// <summary>
+    /// Subtract Vy from Vx. VF is set to 0 when there's an underflow, and 1 when there is not.
+    /// </summary>
     private void OpCode8XY5(byte x, byte y)
     {
         if (V[y] > V[x])
+        {
             V[0xF] = 0;
+        }
         else
+        {
             V[0xF] = 1;
-
+        }
         V[x] -= V[y];
     }
 
