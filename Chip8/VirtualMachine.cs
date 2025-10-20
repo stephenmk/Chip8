@@ -43,7 +43,7 @@ public class VirtualMachine
     private uint _counter;
     private IVmWindow? _window;
 
-    public VirtualMachine(IVmWindow? window, string rom) : this(window, File.ReadAllBytes(rom)) { }
+    public VirtualMachine(IVmWindow? window, string romPath) : this(window, File.ReadAllBytes(romPath)) { }
 
     public VirtualMachine(IVmWindow? window, byte[] rom)
     {
