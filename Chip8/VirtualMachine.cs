@@ -25,31 +25,31 @@ public class VirtualMachine
         0xF0, 0x80, 0xF0, 0x80, 0x80, // F
     ];
 
-    public ushort OpCode { get; private set; }
+    private ushort _opCode;
 
     /// <summary>
     /// 12bit register (for memory address)
     /// </summary>
-    public ushort I { get; private set; }
+    private ushort _i;
 
     /// <summary>
     /// Program Counter
     /// </summary>
-    public ushort PC { get; private set; }
+    private ushort _pc;
 
-    public ushort[] Stack { get; private init; }
-    public ushort SP { get; private set; }
+    private readonly ushort[] _stack;
+    private ushort _sp;
 
-    public byte DelayTimer { get; private set; }
-    public byte SoundTimer { get; private set; }
+    private byte _delayTimer;
+    private byte _soundTimer;
 
     /// <summary>
     /// Variables (16 available, 0 to F)
     /// </summary>
-    public byte[] V { get; private init; }
+    private readonly byte[] _v;
 
-    public byte[] Memory { get; private init; }
-    public byte[] Screen { get; private init; }
+    public readonly byte[] _memory;
+    public readonly byte[] _screen;
 
     private uint _cycleCountModTen;
     private readonly bool[] _keys;
@@ -59,58 +59,58 @@ public class VirtualMachine
 
     public VirtualMachine(IVmWindow? window, byte[] rom)
     {
-        PC = RomStart;
-        OpCode = 0;
-        I = 0;
+        _pc = RomStart;
+        _opCode = 0;
+        _i = 0;
 
-        Stack = new ushort[12];
-        SP = 0;
-        Memory = new byte[4096];
-        Screen = new byte[64 * 32];
-        V = new byte[16];
+        _stack = new ushort[12];
+        _sp = 0;
+        _memory = new byte[4096];
+        _screen = new byte[64 * 32];
+        _v = new byte[16];
 
         _keys = new bool[16];
 
-        SoundTimer = 0;
-        DelayTimer = 0;
+        _soundTimer = 0;
+        _delayTimer = 0;
         _cycleCountModTen = 0;
 
         _window = window;
 
         // Load fonts.
-        Fonts.CopyTo(Memory, 0x0);
+        Fonts.CopyTo(_memory, 0x0);
 
         // Load ROM.
-        rom.CopyTo(Memory, RomStart);
+        rom.CopyTo(_memory, RomStart);
     }
 
     public MachineState Snapshot() => new()
     {
-        OpCode = OpCode,
-        I = I,
-        PC = PC,
-        Stack = Stack.AsSpan(),
-        SP = SP,
-        DelayTimer = DelayTimer,
-        SoundTimer = SoundTimer,
-        V = V.AsSpan(),
-        Memory = Memory.AsSpan(),
-        Screen = Screen.AsSpan(),
+        OpCode = _opCode,
+        I = _i,
+        PC = _pc,
+        Stack = _stack.AsSpan(),
+        SP = _sp,
+        DelayTimer = _delayTimer,
+        SoundTimer = _soundTimer,
+        V = _v.AsSpan(),
+        Memory = _memory.AsSpan(),
+        Screen = _screen.AsSpan(),
     };
 
     public void Reset()
     {
-        PC = RomStart;
-        I = 0;
-        SP = 0;
+        _pc = RomStart;
+        _i = 0;
+        _sp = 0;
         ClearScreen();
     }
 
     private void ClearScreen()
     {
-        for (int i = 0; i < Screen.Length; i++)
+        for (int i = 0; i < _screen.Length; i++)
         {
-            Screen[i] = 0;
+            _screen[i] = 0;
         }
     }
 
@@ -134,21 +134,21 @@ public class VirtualMachine
 
     private void CycleOnce()
     {
-        OpCode = (ushort)(Memory[PC] << 8 | Memory[PC + 1]);
-        PC += 2;
+        _opCode = (ushort)(_memory[_pc] << 8 | _memory[_pc + 1]);
+        _pc += 2;
 
-        ushort nnn = (ushort)(OpCode & 0x0FFF);   // Address
-        byte nn = (byte)(OpCode & 0x00FF);        // 8-bit constant
-        byte n = (byte)(OpCode & 0x000F);         // 4-bit constant
-        byte x = (byte)((OpCode & 0x0F00) >> 8);  // 4-bit register identifier
-        byte y = (byte)((OpCode & 0x00F0) >> 4);  // 4-bit register identifier
+        ushort nnn = (ushort)(_opCode & 0x0FFF);   // Address
+        byte nn = (byte)(_opCode & 0x00FF);        // 8-bit constant
+        byte n = (byte)(_opCode & 0x000F);         // 4-bit constant
+        byte x = (byte)((_opCode & 0x0F00) >> 8);  // 4-bit register identifier
+        byte y = (byte)((_opCode & 0x00F0) >> 4);  // 4-bit register identifier
 
-        switch (OpCode & 0xF000)
+        switch (_opCode & 0xF000)
         {
-            case 0x0000 when OpCode == 0x00E0:
+            case 0x0000 when _opCode == 0x00E0:
                 OpCode00E0();
                 break;
-            case 0x0000 when OpCode == 0x00EE:
+            case 0x0000 when _opCode == 0x00EE:
                 OpCode00EE();
                 break;
             case 0x0000:
@@ -175,31 +175,31 @@ public class VirtualMachine
             case 0x7000:
                 OpCode7XNN(x, nn);
                 break;
-            case 0x8000 when (OpCode & 0x000F) == 0:
+            case 0x8000 when (_opCode & 0x000F) == 0:
                 OpCode8XY0(x, y);
                 break;
-            case 0x8000 when (OpCode & 0x000F) == 1:
+            case 0x8000 when (_opCode & 0x000F) == 1:
                 OpCode8XY1(x, y);
                 break;
-            case 0x8000 when (OpCode & 0x000F) == 2:
+            case 0x8000 when (_opCode & 0x000F) == 2:
                 OpCode8XY2(x, y);
                 break;
-            case 0x8000 when (OpCode & 0x000F) == 3:
+            case 0x8000 when (_opCode & 0x000F) == 3:
                 OpCode8XY3(x, y);
                 break;
-            case 0x8000 when (OpCode & 0x000F) == 4:
+            case 0x8000 when (_opCode & 0x000F) == 4:
                 OpCode8XY4(x, y);
                 break;
-            case 0x8000 when (OpCode & 0x000F) == 5:
+            case 0x8000 when (_opCode & 0x000F) == 5:
                 OpCode8XY5(x, y);
                 break;
-            case 0x8000 when (OpCode & 0x000F) == 6:
+            case 0x8000 when (_opCode & 0x000F) == 6:
                 OpCode8XY6(x);
                 break;
-            case 0x8000 when (OpCode & 0x000F) == 7:
+            case 0x8000 when (_opCode & 0x000F) == 7:
                 OpCode8XY7(x, y);
                 break;
-            case 0x8000 when (OpCode & 0x000F) == 0xE:
+            case 0x8000 when (_opCode & 0x000F) == 0xE:
                 OpCode8XYE(x);
                 break;
             case 0x9000:
@@ -217,41 +217,41 @@ public class VirtualMachine
             case 0xD000:
                 OpCodeDXYN(x, y, n);
                 break;
-            case 0xE000 when (OpCode & 0x00FF) == 0x9E:
+            case 0xE000 when (_opCode & 0x00FF) == 0x9E:
                 OpCodeEX9E(x);
                 break;
-            case 0xE000 when (OpCode & 0x00FF) == 0xA1:
+            case 0xE000 when (_opCode & 0x00FF) == 0xA1:
                 OpCodeEXA1(x);
                 break;
-            case 0xF000 when (OpCode & 0x00FF) == 0x07:
+            case 0xF000 when (_opCode & 0x00FF) == 0x07:
                 OpCodeFX07(x);
                 break;
-            case 0xF000 when (OpCode & 0x00FF) == 0x0A:
+            case 0xF000 when (_opCode & 0x00FF) == 0x0A:
                 OpCodeFX0A(x);
                 break;
-            case 0xF000 when (OpCode & 0x00FF) == 0x15:
+            case 0xF000 when (_opCode & 0x00FF) == 0x15:
                 OpCodeFX15(x);
                 break;
-            case 0xF000 when (OpCode & 0x00FF) == 0x18:
+            case 0xF000 when (_opCode & 0x00FF) == 0x18:
                 OpCodeFX18(x);
                 break;
-            case 0xF000 when (OpCode & 0x00FF) == 0x1E:
+            case 0xF000 when (_opCode & 0x00FF) == 0x1E:
                 OpCodeFX1E(x);
                 break;
-            case 0xF000 when (OpCode & 0x00FF) == 0x29:
+            case 0xF000 when (_opCode & 0x00FF) == 0x29:
                 OpCodeFX29(x);
                 break;
-            case 0xF000 when (OpCode & 0x00FF) == 0x33:
+            case 0xF000 when (_opCode & 0x00FF) == 0x33:
                 OpCodeFX33(x);
                 break;
-            case 0xF000 when (OpCode & 0x00FF) == 0x55:
+            case 0xF000 when (_opCode & 0x00FF) == 0x55:
                 OpCodeFX55(x);
                 break;
-            case 0xF000 when (OpCode & 0x00FF) == 0x65:
+            case 0xF000 when (_opCode & 0x00FF) == 0x65:
                 OpCodeFX65(x);
                 break;
             default:
-                throw new InvalidOperationException($"Invalid OpCode {OpCode:X4} @ PC = 0x{PC:X3}");
+                throw new InvalidOperationException($"Invalid OpCode {_opCode:X4} @ PC = 0x{_pc:X3}");
         }
 
         // The update frequency is 600 Hz. Timers should be updated at 60 Hz, so update timers every 10th cycle.
@@ -264,14 +264,14 @@ public class VirtualMachine
 
     private void UpdateTimers()
     {
-        if (DelayTimer > 0)
+        if (_delayTimer > 0)
         {
-            DelayTimer--;
+            _delayTimer--;
         }
-        if (SoundTimer > 0)
+        if (_soundTimer > 0)
         {
             _window?.Beep();
-            SoundTimer--;
+            _soundTimer--;
         }
     }
 
@@ -282,7 +282,7 @@ public class VirtualMachine
     /// </summary>
     private void OpCode1NNN(ushort nnn)
     {
-        PC = nnn;
+        _pc = nnn;
     }
 
     /// <summary>
@@ -298,7 +298,7 @@ public class VirtualMachine
     /// </summary>
     private void OpCode00EE()
     {
-        PC = Stack[SP--];
+        _pc = _stack[_sp--];
     }
 
     /// <summary>
@@ -306,8 +306,8 @@ public class VirtualMachine
     /// </summary>
     private void OpCode2NNN(ushort nnn)
     {
-        Stack[++SP] = PC;
-        PC = nnn;
+        _stack[++_sp] = _pc;
+        _pc = nnn;
     }
 
     /// <summary>
@@ -315,7 +315,7 @@ public class VirtualMachine
     /// </summary>
     private void OpCodeANNN(ushort nnn)
     {
-        I = nnn;
+        _i = nnn;
     }
 
     /// <summary>
@@ -323,7 +323,7 @@ public class VirtualMachine
     /// </summary>
     private void OpCode6XNN(ushort x, ushort nn)
     {
-        V[x] = (byte)nn;
+        _v[x] = (byte)nn;
     }
 
     /// <summary>
@@ -335,16 +335,16 @@ public class VirtualMachine
     private void OpCodeDXYN(byte X, byte Y, byte N)
     {
         // Initialize the collision detection as no collision detected (yet).
-        V[0xF] = 0;
+        _v[0xF] = 0;
 
         // Draw N lines on the screen.
         for (int line = 0; line < N; line++)
         {
             // y is the starting line Y + current line. If y is larger than the total width of the screen then wrap around (this is the modulo operation).
-            var y = (V[Y] + line) % 32;
+            var y = (_v[Y] + line) % 32;
 
             // The current sprite being drawn, each line is a new sprite.
-            byte sprite = Memory[I + line];
+            byte sprite = _memory[_i + line];
 
             // Each bit in the sprite is a pixel on or off.
             for (int column = 0; column < 8; column++)
@@ -353,16 +353,16 @@ public class VirtualMachine
                 if ((sprite & 0x80) != 0)
                 {
                     // Get the current x position and wrap around if needed.
-                    var x = (V[X] + column) % 64;
+                    var x = (_v[X] + column) % 64;
 
                     // Collision detection: If the target pixel is already set then set the collision detection flag in register VF.
-                    if (Screen[y * 64 + x] == 1)
+                    if (_screen[y * 64 + x] == 1)
                     {
-                        V[0xF] = 1;
+                        _v[0xF] = 1;
                     }
 
                     // Enable or disable the pixel (XOR operation).
-                    Screen[y * 64 + x] ^= 1;
+                    _screen[y * 64 + x] ^= 1;
                 }
 
                 // Shift the next bit in from the right.
@@ -370,7 +370,7 @@ public class VirtualMachine
             }
         }
 
-        _window?.Render(Screen);
+        _window?.Render(_screen);
     }
 
     /// <summary>
@@ -378,7 +378,7 @@ public class VirtualMachine
     /// </summary>
     private void OpCode7XNN(byte x, byte nn)
     {
-        V[x] += nn;
+        _v[x] += nn;
     }
 
     /// <summary>
@@ -386,7 +386,7 @@ public class VirtualMachine
     /// </summary>
     private void OpCode0NNN(ushort nnn)
     {
-        throw new NotImplementedException($"error: {OpCode:X4} has not been implemented.");
+        throw new NotImplementedException($"error: {_opCode:X4} has not been implemented.");
     }
 
     /// <summary>
@@ -397,9 +397,9 @@ public class VirtualMachine
     /// </remarks>
     private void OpCode3XNN(byte x, ushort nn)
     {
-        if (V[x] == nn)
+        if (_v[x] == nn)
         {
-            PC += 2;
+            _pc += 2;
         }
     }
 
@@ -411,9 +411,9 @@ public class VirtualMachine
     /// </remarks>
     private void OpCode4XNN(byte x, ushort nn)
     {
-        if (V[x] != nn)
+        if (_v[x] != nn)
         {
-            PC += 2;
+            _pc += 2;
         }
     }
 
@@ -425,9 +425,9 @@ public class VirtualMachine
     /// </remarks>
     private void OpCode5XY0(byte x, byte y)
     {
-        if (V[x] == V[y])
+        if (_v[x] == _v[y])
         {
-            PC += 2;
+            _pc += 2;
         }
     }
 
@@ -436,7 +436,7 @@ public class VirtualMachine
     /// </summary>
     private void OpCode8XY0(byte x, byte y)
     {
-        V[x] = V[y];
+        _v[x] = _v[y];
     }
 
     /// <summary>
@@ -444,7 +444,7 @@ public class VirtualMachine
     /// </summary>
     private void OpCode8XY1(byte x, byte y)
     {
-        V[x] = (byte)(V[x] | V[y]);
+        _v[x] = (byte)(_v[x] | _v[y]);
     }
 
     /// <summary>
@@ -452,7 +452,7 @@ public class VirtualMachine
     /// </summary>
     private void OpCode8XY2(byte x, byte y)
     {
-        V[x] = (byte)(V[x] & V[y]);
+        _v[x] = (byte)(_v[x] & _v[y]);
     }
 
     /// <summary>
@@ -460,7 +460,7 @@ public class VirtualMachine
     /// </summary>
     private void OpCode8XY3(byte x, byte y)
     {
-        V[x] = (byte)(V[x] ^ V[y]);
+        _v[x] = (byte)(_v[x] ^ _v[y]);
     }
 
     /// <summary>
@@ -468,15 +468,15 @@ public class VirtualMachine
     /// </summary>
     private void OpCode8XY4(byte x, byte y)
     {
-        if (V[y] > (0xFF - V[x]))
+        if (_v[y] > (0xFF - _v[x]))
         {
-            V[0xF] = 1;
+            _v[0xF] = 1;
         }
         else
         {
-            V[0xF] = 0;
+            _v[0xF] = 0;
         }
-        V[x] += V[y];
+        _v[x] += _v[y];
     }
 
     /// <summary>
@@ -484,21 +484,21 @@ public class VirtualMachine
     /// </summary>
     private void OpCode8XY5(byte x, byte y)
     {
-        if (V[y] > V[x])
+        if (_v[y] > _v[x])
         {
-            V[0xF] = 0;
+            _v[0xF] = 0;
         }
         else
         {
-            V[0xF] = 1;
+            _v[0xF] = 1;
         }
-        V[x] -= V[y];
+        _v[x] -= _v[y];
     }
 
     private void OpCode8XY6(byte x)
     {
-        V[0xF] = (byte)(V[x] & 0x1);
-        V[x] >>= 0x1;
+        _v[0xF] = (byte)(_v[x] & 0x1);
+        _v[x] >>= 0x1;
     }
 
     /// <summary>
@@ -506,31 +506,31 @@ public class VirtualMachine
     /// </summary>
     private void OpCode8XY7(byte x, byte y)
     {
-        int diff = V[y] - V[x];
-        V[x] = (byte)(diff & 0xFF);
-        V[0xF] = (byte)(diff > 0 ? 1 : 0);
+        int diff = _v[y] - _v[x];
+        _v[x] = (byte)(diff & 0xFF);
+        _v[0xF] = (byte)(diff > 0 ? 1 : 0);
     }
 
     private void OpCode8XYE(byte x)
     {
-        V[0xF] = (byte)((V[x] & 0x80) >> 7);
-        V[x] <<= 0x1;
+        _v[0xF] = (byte)((_v[x] & 0x80) >> 7);
+        _v[x] <<= 0x1;
     }
 
     private void OpCodeBNNN(ushort nnn)
     {
-        PC = (ushort)(nnn + V[0]);
+        _pc = (ushort)(nnn + _v[0]);
     }
 
     private void OpCodeCXNN(byte x, byte nn)
     {
         var random = new Random();
-        V[x] = (byte)(random.Next(0, 0xFF) & nn);
+        _v[x] = (byte)(random.Next(0, 0xFF) & nn);
     }
 
     private void OpCodeFX1E(byte x)
     {
-        I += V[x];
+        _i += _v[x];
     }
 
     /// <summary>
@@ -543,7 +543,7 @@ public class VirtualMachine
     {
         for (int i = 0; i <= x; i++)
         {
-            V[i] = Memory[I + i];
+            _v[i] = _memory[_i + i];
         }
     }
 
@@ -551,7 +551,7 @@ public class VirtualMachine
     {
         for (int i = 0; i <= x; i++)
         {
-            Memory[I + i] = V[i];
+            _memory[_i + i] = _v[i];
         }
     }
 
@@ -570,7 +570,7 @@ public class VirtualMachine
             {
                 if (_keys[i])
                 {
-                    V[x] = i;
+                    _v[x] = i;
                     return;
                 }
             }
@@ -580,53 +580,53 @@ public class VirtualMachine
 
     private void OpCodeEX9E(byte x)
     {
-        if (_keys[V[x]])
+        if (_keys[_v[x]])
         {
-            PC += 2;
+            _pc += 2;
         }
     }
 
     private void OpCodeEXA1(byte x)
     {
-        if (!_keys[V[x]])
+        if (!_keys[_v[x]])
         {
-            PC += 2;
+            _pc += 2;
         }
     }
 
     private void OpCodeFX15(byte x)
     {
-        DelayTimer = V[x];
+        _delayTimer = _v[x];
     }
 
     private void OpCodeFX18(byte x)
     {
-        SoundTimer = V[x];
+        _soundTimer = _v[x];
     }
 
     private void OpCodeFX07(byte x)
     {
-        V[x] = DelayTimer;
+        _v[x] = _delayTimer;
     }
 
     private void OpCodeFX29(byte x)
     {
-        I = (byte)(V[x] * 5);
+        _i = (byte)(_v[x] * 5);
     }
 
     private void OpCodeFX33(byte x)
     {
-        var number = V[x];
-        Memory[I] = (byte)(number / 100);
-        Memory[I + 1] = (byte)(number / 10 % 10);
-        Memory[I + 2] = (byte)(number % 100 % 10);
+        var number = _v[x];
+        _memory[_i] = (byte)(number / 100);
+        _memory[_i + 1] = (byte)(number / 10 % 10);
+        _memory[_i + 2] = (byte)(number % 100 % 10);
     }
 
     private void OpCode9XY0(byte x, byte y)
     {
-        if (V[x] != V[y])
+        if (_v[x] != _v[y])
         {
-            PC += 2;
+            _pc += 2;
         }
     }
     #endregion
