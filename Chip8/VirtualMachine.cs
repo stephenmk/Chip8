@@ -26,33 +26,33 @@ public class VirtualMachine
         0xF0, 0x80, 0xF0, 0x80, 0x80, // F
     ];
 
-    public ushort OpCode { get; set; }
+    public ushort OpCode { get; private set; }
 
     /// <summary>
     /// 12bit register (for memory address)
     /// </summary>
-    public ushort I { get; set; }
+    public ushort I { get; private set; }
 
     /// <summary>
     /// Program Counter
     /// </summary>
-    public ushort PC { get; set; }
+    public ushort PC { get; private set; }
 
-    public ushort[] Stack { get; set; }
-    public ushort SP { get; set; }
+    public ushort[] Stack { get; private set; }
+    public ushort SP { get; private set; }
 
-    private byte _delayTimer;
-    private byte _soundTimer;
+    public byte DelayTimer { get; private set; }
+    public byte SoundTimer { get; private set; }
 
     /// <summary>
     /// Variables (16 available, 0 to F)
     /// </summary>
-    public byte[] V { get; set; }
+    public byte[] V { get; private set; }
 
-    public byte[] Memory { get; set; }
-    public byte[] Screen { get; set; }
+    public byte[] Memory { get; private set; }
+    public byte[] Screen { get; private set; }
 
-    private uint _counter;
+    private uint _cycleCountModTen;
     private readonly bool[] _keys;
     private readonly IVmWindow? _window;
 
@@ -72,9 +72,9 @@ public class VirtualMachine
 
         _keys = new bool[16];
 
-        _soundTimer = 0;
-        _delayTimer = 0;
-        _counter = 0;
+        SoundTimer = 0;
+        DelayTimer = 0;
+        _cycleCountModTen = 0;
 
         _window = window;
 
@@ -234,96 +234,24 @@ public class VirtualMachine
         }
 
         // The update frequency is 600 Hz. Timers should be updated at 60 Hz, so update timers every 10th cycle.
-        if ((_counter++ % 10) == 0)
+        if ((++_cycleCountModTen % 10) == 0)
         {
             UpdateTimers();
+            _cycleCountModTen = 0;
         }
     }
 
     private void UpdateTimers()
     {
-        if (_delayTimer > 0)
+        if (DelayTimer > 0)
         {
-            _delayTimer--;
+            DelayTimer--;
         }
-        if (_soundTimer > 0)
+        if (SoundTimer > 0)
         {
             _window?.Beep();
-            _soundTimer--;
+            SoundTimer--;
         }
-    }
-
-    public void DebugRegisters()
-    {
-        var output = new StringBuilder();
-        output.AppendLine($"PC              0x{PC:X4}");
-        output.AppendLine($"OpCode          0x{OpCode:X4}");
-        output.AppendLine($"I               0x{I:X4}");
-        output.AppendLine($"sp              0x{SP:X4}");
-
-        foreach (var register in Enumerable.Range(0, 16))
-        {
-            output.AppendLine($"V{register:X}              0x{V[register]:X2}");
-        }
-
-        output.AppendLine($"DelayTimer      {_delayTimer}");
-        output.AppendLine($"SoundTimer      {_soundTimer}");
-
-        Console.WriteLine(output);
-    }
-
-    public void DebugMemory()
-    {
-        var output = new StringBuilder();
-
-        for (int i = 0; i <= 0xfff; i += 8)
-        {
-            output.Append($"0x{i:X3}:");
-            output.Append($" 0x{Memory[i]:X2}");
-            output.Append($" 0x{Memory[i + 1]:X2}");
-            output.Append($" 0x{Memory[i + 2]:X2}");
-            output.Append($" 0x{Memory[i + 3]:X2}");
-            output.Append($" 0x{Memory[i + 4]:X2}");
-            output.Append($" 0x{Memory[i + 5]:X2}");
-            output.Append($" 0x{Memory[i + 6]:X2}");
-            output.Append($" 0x{Memory[i + 7]:X2}");
-            output.AppendLine();
-        }
-
-        Console.WriteLine(output);
-    }
-
-    public void DebugGraphics()
-    {
-        var output = new StringBuilder();
-
-        for (int i = 0; i < Screen.Length; i += 64)
-        {
-            output.Append($"0x{i:X3}:");
-            output.Append($" 0x{Screen[i]:X2}");
-            output.Append($" 0x{Screen[i + 1]:X2}");
-            output.Append($" 0x{Screen[i + 2]:X2}");
-            output.Append($" 0x{Screen[i + 3]:X2}");
-            output.Append($" 0x{Screen[i + 4]:X2}");
-            output.Append($" 0x{Screen[i + 5]:X2}");
-            output.Append($" 0x{Screen[i + 6]:X2}");
-            output.Append($" 0x{Screen[i + 7]:X2}");
-            output.AppendLine();
-        }
-
-        output.AppendLine(" ----------------------------------------------------------------");
-        for (int i = 0; i < 32; i++)
-        {
-            output.Append('|');
-            for (int j = 0; j < 64; j++)
-            {
-                output.Append(Screen[i * 64 + j] > 0 ? "█" : " ");
-            }
-            output.AppendLine("|");
-        }
-        output.AppendLine(" ----------------------------------------------------------------");
-
-        Console.WriteLine(output);
     }
 
     #region OpCodes
@@ -647,17 +575,17 @@ public class VirtualMachine
 
     private void OpCodeFX15(byte x)
     {
-        _delayTimer = V[x];
+        DelayTimer = V[x];
     }
 
     private void OpCodeFX18(byte x)
     {
-        _soundTimer = V[x];
+        SoundTimer = V[x];
     }
 
     private void OpCodeFX07(byte x)
     {
-        V[x] = _delayTimer;
+        V[x] = DelayTimer;
     }
 
     private void OpCodeFX29(byte x)

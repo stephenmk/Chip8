@@ -12,6 +12,7 @@ public class Window : GameWindow, IVmWindow
     private bool _isRunning;
     private bool _isPlayingSound;
     private VirtualMachine? _virtualMachine;
+    private Debugger? _debugger;
 
     public Window(GameWindowSettings gameSettings, NativeWindowSettings nativeSettings)
         : base(gameSettings, nativeSettings) { }
@@ -53,7 +54,8 @@ public class Window : GameWindow, IVmWindow
     protected override void OnFileDrop(FileDropEventArgs obj)
     {
         string romPath = obj.FileNames[0];
-        _virtualMachine = new VirtualMachine(this, romPath);
+        _virtualMachine = new(this, romPath);
+        _debugger = new(_virtualMachine);
         _isRunning = true;
     }
 
@@ -92,20 +94,20 @@ public class Window : GameWindow, IVmWindow
                 Close();
                 break;
             case Keys.G:
-                _virtualMachine?.DebugGraphics();
+                _debugger?.PrintScreen();
                 break;
             case Keys.M:
-                _virtualMachine?.DebugMemory();
+                _debugger?.PrintMemory();
                 break;
             case Keys.R:
-                _virtualMachine?.DebugRegisters();
+                _debugger?.PrintRegisters();
                 break;
             case Keys.P:
                 _isRunning = !_isRunning;
                 break;
             case Keys.S:
                 _virtualMachine?.EmulateCycles(1);
-                _virtualMachine?.DebugRegisters();
+                _debugger?.PrintRegisters();
                 break;
             case Keys.Backspace:
                 _virtualMachine?.Reset();
