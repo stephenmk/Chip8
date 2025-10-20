@@ -6,7 +6,7 @@ namespace Chip8;
 
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
         var gameSettings = new GameWindowSettings
         {
@@ -15,7 +15,7 @@ class Program
 
         var nativeSettings = new NativeWindowSettings
         {
-            Size = new Vector2i(1024, 512),
+            ClientSize = new Vector2i(1024, 512),
             Profile = ContextProfile.Compatability,
             Title = "Chip8 Emulator"
         };

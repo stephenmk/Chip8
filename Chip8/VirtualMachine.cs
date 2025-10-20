@@ -173,13 +173,13 @@ public class VirtualMachine
                 OpCode8XY5(x, y);
                 break;
             case 0x8000 when (OpCode & 0x000F) == 6:
-                OpCode8XY6(x, y);
+                OpCode8XY6(x);
                 break;
             case 0x8000 when (OpCode & 0x000F) == 7:
                 OpCode8XY7(x, y);
                 break;
             case 0x8000 when (OpCode & 0x000F) == 0xE:
-                OpCode8XYE(x, y);
+                OpCode8XYE(x);
                 break;
             case 0x9000:
                 OpCode9XY0(x, y);
@@ -314,7 +314,7 @@ public class VirtualMachine
         output.AppendLine(" ----------------------------------------------------------------");
         for (int i = 0; i < 32; i++)
         {
-            output.Append("|");
+            output.Append('|');
             for (int j = 0; j < 64; j++)
             {
                 output.Append(Gfx[i * 64 + j] > 0 ? "█" : " ");
@@ -546,7 +546,7 @@ public class VirtualMachine
         V[x] -= V[y];
     }
 
-    private void OpCode8XY6(byte x, byte y)
+    private void OpCode8XY6(byte x)
     {
         V[0xF] = (byte)(V[x] & 0x1);
         V[x] >>= 0x1;
@@ -562,7 +562,7 @@ public class VirtualMachine
         V[0xF] = (byte)(diff > 0 ? 1 : 0);
     }
 
-    private void OpCode8XYE(byte x, byte y)
+    private void OpCode8XYE(byte x)
     {
         V[0xF] = (byte)((V[x] & 0x80) >> 7);
         V[x] <<= 0x1;
