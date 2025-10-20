@@ -1,13 +1,12 @@
-﻿using System;
-using System.IO;
-using System.Linq;
+﻿using System.Collections.Immutable;
 using System.Text;
 
 namespace Chip8;
 
 public class VirtualMachine
 {
-    private readonly byte[] Fonts =
+    private const ushort RomStart = 0x200;
+    private readonly ImmutableArray<byte> Fonts =
     [
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
         0x20, 0x60, 0x20, 0x20, 0x70, // 1
@@ -24,7 +23,7 @@ public class VirtualMachine
         0xF0, 0x80, 0x80, 0x80, 0xF0, // C
         0xE0, 0x90, 0x90, 0x90, 0xE0, // D
         0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
-        0xF0, 0x80, 0xF0, 0x80, 0x80  // F
+        0xF0, 0x80, 0xF0, 0x80, 0x80, // F
     ];
 
     public ushort OpCode { get; set; }
@@ -33,19 +32,18 @@ public class VirtualMachine
     public ushort[] Stack { get; set; }
     public ushort SP { get; set; }
 
-    private byte DelayTimer;
-    private byte SoundTimer;
+    private byte _delayTimer;
+    private byte _soundTimer;
 
     public byte[] V { get; set; }
     public byte[] Memory { get; set; }
     public byte[] Gfx { get; set; }
 
-    private bool[] Keys;
-    private uint Counter;
+    private bool[] _keys;
+    private uint _counter;
+    private IVmWindow _window;
 
-    const ushort RomStart = 0x200;
-
-    private IVmWindow Window;
+    public VirtualMachine(IVmWindow window, string rom) : this(window, File.ReadAllBytes(rom)) { }
 
     public VirtualMachine(IVmWindow window, byte[] rom)
     {
@@ -58,13 +56,13 @@ public class VirtualMachine
         Memory = new byte[4096];
         Gfx    = new byte[64 * 32];
         V      = new byte[16];
-        Keys   = new bool[16];
+        _keys   = new bool[16];
 
-        SoundTimer = 0;
-        DelayTimer = 0;
-        Counter = 0;
+        _soundTimer = 0;
+        _delayTimer = 0;
+        _counter = 0;
 
-        Window = window;
+        _window = window;
 
         // Load fonts.
         Fonts.CopyTo(Memory, 0x0);
@@ -72,8 +70,6 @@ public class VirtualMachine
         // Load rom.
         rom.CopyTo(Memory, RomStart);
     }
-
-    public VirtualMachine(IVmWindow window, string rom) : this(window, File.ReadAllBytes(rom)) { }
 
     public void Reset()
     {
@@ -85,12 +81,12 @@ public class VirtualMachine
 
     public void KeyUp(byte key)
     {
-        Keys[key] = false;
+        _keys[key] = false;
     }
 
     public void KeyDown(byte key)
     {
-        Keys[key] = true;
+        _keys[key] = true;
     }
 
     public void EmulateCycles(uint times)
@@ -224,24 +220,24 @@ public class VirtualMachine
         }
 
         // The update frequency is 600 Hz. Timers should be updated at 60 Hz, so update timers every 10th cycle.
-        if ((Counter % 10) == 0)
+        if ((_counter % 10) == 0)
         {
             UpdateTimers();
         }
 
-        Counter++;
+        _counter++;
     }
 
     private void UpdateTimers()
     {
-        if (DelayTimer > 0)
+        if (_delayTimer > 0)
         {
-            DelayTimer--;
+            _delayTimer--;
         }
-        if (SoundTimer > 0)
+        if (_soundTimer > 0)
         {
-            Window?.Beep();
-            SoundTimer--;
+            _window?.Beep();
+            _soundTimer--;
         }
     }
 
@@ -258,8 +254,8 @@ public class VirtualMachine
             output.AppendLine($"V{register:X}              0x{V[register]:X2}");
         }
 
-        output.AppendLine($"DelayTimer      {DelayTimer}");
-        output.AppendLine($"SoundTimer      {SoundTimer}");
+        output.AppendLine($"DelayTimer      {_delayTimer}");
+        output.AppendLine($"SoundTimer      {_soundTimer}");
 
         Console.WriteLine(output);
     }
@@ -389,7 +385,7 @@ public class VirtualMachine
             }
         }
 
-        Window?.Render();
+        _window?.Render();
     }
 
     private void OpCode7XNN(byte X, byte NN)
@@ -523,20 +519,20 @@ public class VirtualMachine
         {
             for (byte i = 0; i < 0xF; i++)
             {
-                if (Keys[i])
+                if (_keys[i])
                 {
                     V[X] = i;
                     return;
                 }
             }
 
-            Window?.ProcessEvents(1); // TODO: 1 is a guess. What should this timeout be?
+            _window?.ProcessEvents(1); // TODO: 1 is a guess. What should this timeout be?
         }
     }
 
     private void OpCodeEX9E(byte X)
     {
-        if (Keys[V[X]])
+        if (_keys[V[X]])
         {
             PC += 2;
         }
@@ -544,7 +540,7 @@ public class VirtualMachine
 
     private void OpCodeEXA1(byte X)
     {
-        if (!Keys[V[X]])
+        if (!_keys[V[X]])
         {
             PC += 2;
         }
@@ -552,17 +548,17 @@ public class VirtualMachine
 
     private void OpCodeFX15(byte X)
     {
-        DelayTimer = V[X];
+        _delayTimer = V[X];
     }
 
     private void OpCodeFX18(byte X)
     {
-        SoundTimer = V[X];
+        _soundTimer = V[X];
     }
 
     private void OpCodeFX07(byte X)
     {
-        V[X] = DelayTimer;
+        V[X] = _delayTimer;
     }
 
     private void OpCodeFX29(byte X)

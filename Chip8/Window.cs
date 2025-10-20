@@ -1,5 +1,4 @@
-﻿using System;
-using OpenTK.Windowing.Desktop;
+﻿using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.Common;
 using OpenTK.Input;
 using OpenTK.Windowing.Common.Input;
@@ -7,7 +6,6 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Mathematics;
 using System.Drawing;
-using System.Threading.Tasks;
 using System.ComponentModel;
 
 namespace Chip8;
@@ -38,7 +36,7 @@ public class Window : GameWindow, IVmWindow
         _ => null,
     };
 
-    private VirtualMachine? vm;
+    private VirtualMachine? _virtualMachine;
 
     public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
     {
@@ -48,7 +46,7 @@ public class Window : GameWindow, IVmWindow
     private void Window_FileDrop(FileDropEventArgs obj)
     {
         string rom = obj.FileNames[0];
-        vm = new VirtualMachine(this, rom);
+        _virtualMachine = new VirtualMachine(this, rom);
 
         _isRunning = true;
     }
@@ -71,7 +69,7 @@ public class Window : GameWindow, IVmWindow
 
         if (KeyToByte(e.Key) is byte value)
         {
-            vm?.KeyUp(value);
+            _virtualMachine?.KeyUp(value);
         }
     }
 
@@ -81,7 +79,7 @@ public class Window : GameWindow, IVmWindow
 
         if (KeyToByte(e.Key) is byte value)
         {
-            vm?.KeyDown(value);
+            _virtualMachine?.KeyDown(value);
             return;
         }
 
@@ -91,23 +89,23 @@ public class Window : GameWindow, IVmWindow
                 Close();
                 break;
             case Keys.G:
-                vm?.DebugGraphics();
+                _virtualMachine?.DebugGraphics();
                 break;
             case Keys.M:
-                vm?.DebugMemory();
+                _virtualMachine?.DebugMemory();
                 break;
             case Keys.R:
-                vm?.DebugRegisters();
+                _virtualMachine?.DebugRegisters();
                 break;
             case Keys.P:
                 _isRunning = !_isRunning;
                 break;
             case Keys.S:
-                vm?.EmulateCycle();
-                vm?.DebugRegisters();
+                _virtualMachine?.EmulateCycle();
+                _virtualMachine?.DebugRegisters();
                 break;
             case Keys.Backspace:
-                vm?.Reset();
+                _virtualMachine?.Reset();
                 break;
             default:
                 break;
@@ -120,7 +118,7 @@ public class Window : GameWindow, IVmWindow
 
         if (_isRunning)
         {
-            vm?.EmulateCycle();
+            _virtualMachine?.EmulateCycle();
         }
     }
 
@@ -133,7 +131,7 @@ public class Window : GameWindow, IVmWindow
 
     public void Render()
     {
-        var buffer = vm?.Gfx;
+        var buffer = _virtualMachine?.Gfx;
         if (buffer != null)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit);
