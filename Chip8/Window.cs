@@ -48,7 +48,7 @@ public class Window : GameWindow, IWindow
         _ => null,
     };
 
-    private Vm vm;
+    private VirtualMachine vm;
 
     public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
     {
@@ -58,7 +58,7 @@ public class Window : GameWindow, IWindow
     private void Window_FileDrop(FileDropEventArgs obj)
     {
         string rom = obj.FileNames[0];
-        vm = Vm.NewVm(this, rom);
+        vm = VirtualMachine.NewVm(this, rom);
 
         running = true;
     }

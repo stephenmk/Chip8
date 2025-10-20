@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Timers;
 
 namespace Chip8;
 
-public class Vm
+public class VirtualMachine
 {
     private readonly byte[] Fonts =
     [
@@ -51,9 +47,9 @@ public class Vm
 
     private IWindow Window;
 
-    public static Vm NewVm(IWindow window, byte[] rom)
+    public static VirtualMachine NewVm(IWindow window, byte[] rom)
     {
-        var vm = new Vm
+        var vm = new VirtualMachine
         {
             PC = RomStart,
             OpCode = 0,
@@ -78,7 +74,7 @@ public class Vm
         return vm;
     }
 
-    public static Vm NewVm(IWindow window, string rom)
+    public static VirtualMachine NewVm(IWindow window, string rom)
     {
         var bytes = File.ReadAllBytes(rom);
         return NewVm(window, bytes);
@@ -112,9 +108,9 @@ public class Vm
         Keys[key] = true;
     }
 
-    public void EmulateCycles(int times)
+    public void EmulateCycles(uint times)
     {
-        foreach (var _ in Enumerable.Range(0, times))
+        for (uint i = 0; i < times; i++)
         {
             EmulateCycle();
         }
@@ -253,7 +249,10 @@ public class Vm
 
     private void UpdateTimers()
     {
-        if (DelayTimer > 0) DelayTimer--;
+        if (DelayTimer > 0)
+        {
+            DelayTimer--;
+        }
         if (SoundTimer > 0)
         {
             Window?.Beep();
