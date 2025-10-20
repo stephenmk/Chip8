@@ -38,7 +38,7 @@ public class Window : GameWindow, IVmWindow
         _ => null,
     };
 
-    private VirtualMachine vm;
+    private VirtualMachine? vm;
 
     public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
     {

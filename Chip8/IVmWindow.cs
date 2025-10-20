@@ -5,7 +5,7 @@ namespace Chip8;
 /// </summary>
 public interface IVmWindow
 {
-    public void Render();
-    public bool ProcessEvents(double timeout);
-    public void Beep();
+    void Render();
+    bool ProcessEvents(double timeout);
+    void Beep();
 }
