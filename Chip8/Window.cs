@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.Common;
 using OpenTK.Input;
@@ -9,7 +7,6 @@ using OpenTK.Graphics.OpenGL;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Mathematics;
 using System.Drawing;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.ComponentModel;
 
@@ -58,7 +55,7 @@ public class Window : GameWindow, IWindow
     private void Window_FileDrop(FileDropEventArgs obj)
     {
         string rom = obj.FileNames[0];
-        vm = VirtualMachine.NewVm(this, rom);
+        vm = new VirtualMachine(this, rom);
 
         running = true;
     }

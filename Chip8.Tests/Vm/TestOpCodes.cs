@@ -8,10 +8,11 @@ public class TestOpCodes
     [TestMethod]
     public void Test_OpCode00E0_ShouldClearScreen()
     {
-        var vm = VirtualMachine.NewVm(null,
+        byte[] rom =
         [
             0x00, 0xE0  // 0x00E0 - Clear the screen
-        ]);
+        ];
+        var vm = new VirtualMachine(null, rom);
         vm.EmulateCycle();
 
         var empty = new byte[64 * 32];
@@ -21,7 +22,7 @@ public class TestOpCodes
     [TestMethod]
     public void Test_OpCode00EE_ShouldSetPCTo0x202()
     {
-        var vm = VirtualMachine.NewVm(null,
+        var vm = new VirtualMachine(null,
         [
             0x22, 0x04,  // Call subroutine at 0x204
             0x13, 0x37,  // Execution should continue here at 0x202
@@ -35,7 +36,7 @@ public class TestOpCodes
     [TestMethod]
     public void Test_OpCode1NNN_ShouldSetPCTo0x123()
     {
-        var vm = VirtualMachine.NewVm(null,
+        var vm = new VirtualMachine(null,
         [
             0x11, 0x23,  // Jump to address 0x123
         ]);
@@ -47,7 +48,7 @@ public class TestOpCodes
     [TestMethod]
     public void Test_OpCode3XNN_ShouldSetPCTo0x206()
     {
-        var vm = VirtualMachine.NewVm(null,
+        var vm = new VirtualMachine(null,
         [
             0x60, 0x11,  // Set V0 to 0x11.
             0x30, 0x11   // Should skip the next instruction
@@ -60,7 +61,7 @@ public class TestOpCodes
     [TestMethod]
     public void Test_OpCode4XNN_ShouldSetPCTo0x206()
     {
-        var vm = VirtualMachine.NewVm(null,
+        var vm = new VirtualMachine(null,
         [
             0x60, 0x11,  // Set V0 to 0x11.
             0x40, 0x12   // Should skip the next instruction
@@ -73,7 +74,7 @@ public class TestOpCodes
     [TestMethod]
     public void Test_OpCode5XY0_ShouldSetPCTo0x208()
     {
-        var vm = VirtualMachine.NewVm(null,
+        var vm = new VirtualMachine(null,
         [
             0x60, 0x11,  // Set V0 to 0x11.
             0x61, 0x11,  // Set V1 to 0x11.
@@ -87,7 +88,7 @@ public class TestOpCodes
     [TestMethod]
     public void Test_OpCode6XNN_ShouldSetV0To0xAA()
     {
-        var vm = VirtualMachine.NewVm(null,
+        var vm = new VirtualMachine(null,
         [
             0x60, 0xAA,  // Set V0 to 0xAA.
         ]);
@@ -99,7 +100,7 @@ public class TestOpCodes
     [TestMethod]
     public void Test_OpCode8XY5_ShouldSetVFFlag0()
     {
-        var vm = VirtualMachine.NewVm(null,
+        var vm = new VirtualMachine(null,
         [
             0x60, 0x05,  // Set V0 to 0x5.
             0x61, 0x06,  // Set V1 to 0x6.
@@ -113,7 +114,7 @@ public class TestOpCodes
     [TestMethod]
     public void Test_OpCode8XY5_ShouldSetVFFlag1()
     {
-        var vm = VirtualMachine.NewVm(null,
+        var vm = new VirtualMachine(null,
         [
             0x60, 0xF1,  // Set VF to 0x1.
             0x60, 0x05,  // Set V0 to 0x6.

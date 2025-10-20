@@ -47,38 +47,33 @@ public class VirtualMachine
 
     private IWindow Window;
 
-    public static VirtualMachine NewVm(IWindow window, byte[] rom)
+    public VirtualMachine(IWindow window, byte[] rom)
     {
-        var vm = new VirtualMachine
-        {
-            PC = RomStart,
-            OpCode = 0,
-            I = 0,
+        PC = RomStart;
+        OpCode = 0;
+        I = 0;
 
-            Stack  = new ushort[12],
-            SP     = 0,
-            Memory = new byte[4096],
-            Gfx    = new byte[64 * 32],
-            V      = new byte[16],
-            Keys   = new bool[16],
+        Stack  = new ushort[12];
+        SP     = 0;
+        Memory = new byte[4096];
+        Gfx    = new byte[64 * 32];
+        V      = new byte[16];
+        Keys   = new bool[16];
 
-            SoundTimer = 0,
-            DelayTimer = 0,
-            Counter = 0,
+        SoundTimer = 0;
+        DelayTimer = 0;
+        Counter = 0;
 
-            Window = window
-        };
-        vm.LoadFonts();
-        vm.LoadRom(rom);
+        Window = window;
 
-        return vm;
+        // Load fonts.
+        Fonts.CopyTo(Memory, 0x0);
+
+        // Load rom.
+        rom.CopyTo(Memory, RomStart);
     }
 
-    public static VirtualMachine NewVm(IWindow window, string rom)
-    {
-        var bytes = File.ReadAllBytes(rom);
-        return NewVm(window, bytes);
-    }
+    public VirtualMachine(IWindow window, string rom) : this(window, File.ReadAllBytes(rom)) { }
 
     public void Reset()
     {
@@ -86,16 +81,6 @@ public class VirtualMachine
         I = 0;
         SP = 0;
         Gfx = new byte[64 * 32];
-    }
-
-    private void LoadFonts()
-    {
-        Fonts.CopyTo(Memory, 0x0);
-    }
-
-    private void LoadRom(byte[] rom)
-    {
-        rom.CopyTo(Memory, RomStart);
     }
 
     public void KeyUp(byte key)
