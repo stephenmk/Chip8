@@ -27,8 +27,17 @@ public class VirtualMachine
     ];
 
     public ushort OpCode { get; set; }
+
+    /// <summary>
+    /// 12bit register (for memory address)
+    /// </summary>
     public ushort I { get; set; }
+
+    /// <summary>
+    /// Program Counter
+    /// </summary>
     public ushort PC { get; set; }
+
     public ushort[] Stack { get; set; }
     public ushort SP { get; set; }
 
@@ -51,12 +60,13 @@ public class VirtualMachine
         OpCode = 0;
         I = 0;
 
-        Stack  = new ushort[12];
-        SP     = 0;
+        Stack = new ushort[12];
+        SP = 0;
         Memory = new byte[4096];
-        Gfx    = new byte[64 * 32];
-        V      = new byte[16];
-        _keys   = new bool[16];
+        Gfx = new byte[64 * 32];
+        V = new byte[16];
+
+        _keys = new bool[16];
 
         _soundTimer = 0;
         _delayTimer = 0;
@@ -102,11 +112,11 @@ public class VirtualMachine
         OpCode = (ushort)(Memory[PC] << 8 | Memory[PC + 1]);
         PC += 2;
 
-        ushort NNN = (ushort)(OpCode & 0x0FFF);
-        byte NN    = (byte)(OpCode & 0x00FF);
-        byte N     = (byte)(OpCode & 0x000F);
-        byte X     = (byte)((OpCode & 0x0F00) >> 8);
-        byte Y     = (byte)((OpCode & 0x00F0) >> 4);
+        ushort NNN = (ushort)(OpCode & 0x0FFF);   // Address
+        byte NN = (byte)(OpCode & 0x00FF);        // 8-bit constant
+        byte N = (byte)(OpCode & 0x000F);         // 4-bit constant
+        byte X = (byte)((OpCode & 0x0F00) >> 8);  // 4-bit register identifier
+        byte Y = (byte)((OpCode & 0x00F0) >> 4);  // 4-bit register identifier
 
         switch (OpCode & 0xF000)
         {
@@ -315,35 +325,54 @@ public class VirtualMachine
     }
 
     #region OpCodes
-    private void OpCode1NNN(ushort NNN)
+
+    /// <summary>
+    /// Jumps to address NNN.
+    /// </summary>
+    private void OpCode1NNN(ushort nnn)
     {
-        PC = NNN;
+        PC = nnn;
     }
 
+    /// <summary>
+    /// Clears the screen.
+    /// </summary>
     private void OpCode00E0()
     {
         Gfx = new byte[64 * 32];
     }
 
+    /// <summary>
+    /// Returns from a subroutine.
+    /// </summary>
     private void OpCode00EE()
     {
         PC = Stack[SP--];
     }
 
-    private void OpCode2NNN(ushort NNN)
+    /// <summary>
+    /// Calls subroutine at NNN.
+    /// </summary>
+    private void OpCode2NNN(ushort nnn)
     {
         Stack[++SP] = PC;
-        PC = NNN;
+        PC = nnn;
     }
 
-    private void OpCodeANNN(ushort NNN)
+    /// <summary>
+    /// Sets I to the address NNN.
+    /// </summary>
+    private void OpCodeANNN(ushort nnn)
     {
-        I = NNN;
+        I = nnn;
     }
 
-    private void OpCode6XNN(ushort X, ushort NN)
+    /// <summary>
+    /// Sets Vx to NN.
+    /// </summary>
+    private void OpCode6XNN(ushort x, ushort nn)
     {
-        V[X] = (byte)NN;
+        V[x] = (byte)nn;
     }
 
     // Source: https://stackoverflow.com/questions/17346592/how-does-chip-8-graphics-rendered-on-screen
@@ -388,132 +417,157 @@ public class VirtualMachine
         _window?.Render();
     }
 
-    private void OpCode7XNN(byte X, byte NN)
+    /// <summary>
+    /// Adds NN to Vx (carry flag is not changed).
+    /// </summary>
+    private void OpCode7XNN(byte x, byte nn)
     {
-        V[X] += NN;
+        V[x] += nn;
     }
 
-    private void OpCode0NNN(ushort NNN)
+    /// <summary>
+    /// Calls machine code routine (RCA 1802 for COSMAC VIP) at address NNN. Not necessary for most ROMs.
+    /// </summary>
+    private void OpCode0NNN(ushort nnn)
     {
         throw new NotImplementedException($"error: {OpCode:X4} has not been implemented.");
     }
 
-    private void OpCode3XNN(byte X, ushort NN)
+    /// <summary>
+    /// Skips the next instruction if Vx equals NN (usually the next instruction is a jump to skip a code block).
+    /// </summary>
+    private void OpCode3XNN(byte x, ushort nn)
     {
-        if (V[X] == NN)
+        if (V[x] == nn)
         {
             PC += 2;
         }
     }
 
-    private void OpCode4XNN(byte X, ushort NN)
+    private void OpCode4XNN(byte x, ushort nn)
     {
-        if (V[X] != NN)
+        if (V[x] != nn)
         {
             PC += 2;
         }
     }
 
-    private void OpCode5XNN(byte X, byte Y)
+    private void OpCode5XNN(byte x, byte y)
     {
-        if (V[X] == V[Y])
+        if (V[x] == V[y])
         {
             PC += 2;
         }
     }
 
-    private void OpCode8XY0(byte X, byte Y)
+    private void OpCode8XY0(byte x, byte y)
     {
-        V[X] = V[Y];
+        V[x] = V[y];
     }
 
-    private void OpCode8XY1(byte X, byte Y)
+    private void OpCode8XY1(byte x, byte y)
     {
-        V[X] = (byte)(V[X] | V[Y]);
+        V[x] = (byte)(V[x] | V[y]);
     }
 
-    private void OpCode8XY2(byte X, byte Y)
+    private void OpCode8XY2(byte x, byte y)
     {
-        V[X] = (byte)(V[X] & V[Y]);
+        V[x] = (byte)(V[x] & V[y]);
     }
 
-    private void OpCode8XY3(byte X, byte Y)
+    private void OpCode8XY3(byte x, byte y)
     {
-        V[X] = (byte)(V[X] ^ V[Y]);
+        V[x] = (byte)(V[x] ^ V[y]);
     }
 
-    private void OpCode8XY4(byte X, byte Y)
+    private void OpCode8XY4(byte x, byte y)
     {
-        if (V[Y] > (0xFF - V[X]))
+        if (V[y] > (0xFF - V[x]))
             V[0xF] = 1;
         else
             V[0xF] = 0;
 
-        V[X] += V[Y];
+        V[x] += V[y];
     }
 
-    private void OpCode8XY5(byte X, byte Y)
+    private void OpCode8XY5(byte x, byte y)
     {
-        if (V[Y] > V[X])
+        if (V[y] > V[x])
             V[0xF] = 0;
         else
             V[0xF] = 1;
 
-        V[X] -= V[Y];
+        V[x] -= V[y];
     }
 
-    private void OpCode8XY6(byte X, byte Y)
+    private void OpCode8XY6(byte x, byte y)
     {
-        V[0xF] = (byte)(V[X] & 0x1);
-        V[X] >>= 0x1;
+        V[0xF] = (byte)(V[x] & 0x1);
+        V[x] >>= 0x1;
     }
 
-    private void OpCode8XY7(byte X, byte Y)
+    /// <summary>
+    /// Sets Vx to Vy minus Vx. VF is set to 0 when there's an underflow, and 1 when there is not.
+    /// </summary>
+    private void OpCode8XY7(byte x, byte y)
     {
-        int diff = V[Y] - V[X];
-        V[X] = (byte)(diff & 0xFF);
+        int diff = V[y] - V[x];
+        V[x] = (byte)(diff & 0xFF);
         V[0xF] = (byte)(diff > 0 ? 1 : 0);
     }
 
-    private void OpCode8XYE(byte X, byte Y)
+    private void OpCode8XYE(byte x, byte y)
     {
-        V[0xF] = (byte)((V[X] & 0x80) >> 7);
-        V[X] <<= 0x1;
+        V[0xF] = (byte)((V[x] & 0x80) >> 7);
+        V[x] <<= 0x1;
     }
 
-    private void OpCodeBNNN(ushort NNN)
+    private void OpCodeBNNN(ushort nnn)
     {
-        PC = (ushort)(NNN + V[0]);
+        PC = (ushort)(nnn + V[0]);
     }
 
-    private void OpCodeCXNN(byte X, byte NN)
+    private void OpCodeCXNN(byte x, byte nn)
     {
         var random = new Random();
-        V[X] = (byte)(random.Next(0, 0xFF) & NN);
+        V[x] = (byte)(random.Next(0, 0xFF) & nn);
     }
 
-    private void OpCodeFX1E(byte X)
+    private void OpCodeFX1E(byte x)
     {
-        I += V[X];
+        I += V[x];
     }
 
-    private void OpCodeFX65(byte X)
+    /// <summary>
+    /// Fills from V0 to VX (including VX) with values from memory, starting at address I.
+    /// </summary>
+    /// <remarks>
+    /// The offset from I is increased by 1 for each value read, but I itself is left unmodified.
+    /// </remarks>
+    private void OpCodeFX65(byte x)
     {
-        for (int i = 0; i <= X; i++)
+        for (int i = 0; i <= x; i++)
         {
             V[i] = Memory[I + i];
         }
     }
 
-    private void OpCodeFX55(byte X)
+    private void OpCodeFX55(byte x)
     {
-        for (int i = 0; i <= X; i++)
+        for (int i = 0; i <= x; i++)
         {
             Memory[I + i] = V[i];
         }
     }
 
-    private void OpCodeFX0A(byte X)
+    /// <summary>
+    /// A key press is awaited, and then stored in Vx 
+    /// </summary>
+    /// <remarks>
+    /// Blocking operation; all instruction halted until next key event.
+    /// Delay and sound timers should continue processing.
+    /// </remarks>
+    private void OpCodeFX0A(byte x)
     {
         while (true)
         {
@@ -521,62 +575,61 @@ public class VirtualMachine
             {
                 if (_keys[i])
                 {
-                    V[X] = i;
+                    V[x] = i;
                     return;
                 }
             }
-
             _window?.ProcessEvents(1); // TODO: 1 is a guess. What should this timeout be?
         }
     }
 
-    private void OpCodeEX9E(byte X)
+    private void OpCodeEX9E(byte x)
     {
-        if (_keys[V[X]])
+        if (_keys[V[x]])
         {
             PC += 2;
         }
     }
 
-    private void OpCodeEXA1(byte X)
+    private void OpCodeEXA1(byte x)
     {
-        if (!_keys[V[X]])
+        if (!_keys[V[x]])
         {
             PC += 2;
         }
     }
 
-    private void OpCodeFX15(byte X)
+    private void OpCodeFX15(byte x)
     {
-        _delayTimer = V[X];
+        _delayTimer = V[x];
     }
 
-    private void OpCodeFX18(byte X)
+    private void OpCodeFX18(byte x)
     {
-        _soundTimer = V[X];
+        _soundTimer = V[x];
     }
 
-    private void OpCodeFX07(byte X)
+    private void OpCodeFX07(byte x)
     {
-        V[X] = _delayTimer;
+        V[x] = _delayTimer;
     }
 
-    private void OpCodeFX29(byte X)
+    private void OpCodeFX29(byte x)
     {
-        I = (byte)(V[X] * 5);
+        I = (byte)(V[x] * 5);
     }
 
-    private void OpCodeFX33(byte X)
+    private void OpCodeFX33(byte x)
     {
-        var number = V[X];
+        var number = V[x];
         Memory[I] = (byte)(number / 100);
         Memory[I + 1] = (byte)(number / 10 % 10);
         Memory[I + 2] = (byte)(number % 100 % 10);
     }
 
-    private void OpCode9XY0(byte X, byte Y)
+    private void OpCode9XY0(byte x, byte y)
     {
-        if (V[X] != V[Y])
+        if (V[x] != V[y])
         {
             PC += 2;
         }

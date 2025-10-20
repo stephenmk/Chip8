@@ -1,4 +1,3 @@
-using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Chip8.Tests;
