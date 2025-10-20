@@ -10,7 +10,7 @@ internal static class TestMethods
             byte[] romBytes => new VirtualMachine(null, romBytes),
             _ => throw new Exception()
         };
-        vm.EmulateCycles(cycles);
+        vm.Cycle(cycles);
         return vm.Snapshot();
     }
 

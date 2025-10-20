@@ -124,15 +124,15 @@ public class VirtualMachine
         _keys[key] = true;
     }
 
-    public void EmulateCycles(uint times)
+    public void Cycle(uint times)
     {
         for (uint i = 0; i < times; i++)
         {
-            EmulateCycle();
+            CycleOnce();
         }
     }
 
-    private void EmulateCycle()
+    private void CycleOnce()
     {
         OpCode = (ushort)(Memory[PC] << 8 | Memory[PC + 1]);
         PC += 2;
