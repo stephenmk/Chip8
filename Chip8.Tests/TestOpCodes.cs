@@ -12,7 +12,7 @@ public class TestOpCodes
             0x00, 0xE0  // 0x00E0 - Clear the screen
         ];
         var vm = new VirtualMachine(null, rom);
-        vm.EmulateCycle();
+        vm.EmulateCycles(1);
         var empty = new byte[64 * 32];
         CollectionAssert.AreEqual(empty, vm.Gfx);
     }
@@ -37,7 +37,7 @@ public class TestOpCodes
             0x11, 0x23  // Jump to address 0x123
         ];
         var vm = new VirtualMachine(null, rom);
-        vm.EmulateCycle();
+        vm.EmulateCycles(1);
 
         Assert.AreEqual(0x123, vm.PC);
     }
@@ -86,7 +86,7 @@ public class TestOpCodes
             0x60, 0xAA  // Set V0 to 0xAA.
         ];
         var vm = new VirtualMachine(null, rom);
-        vm.EmulateCycle();
+        vm.EmulateCycles(1);
         Assert.AreEqual(0xAA, vm.V[0]);
     }
 

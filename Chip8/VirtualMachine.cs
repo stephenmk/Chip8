@@ -52,9 +52,9 @@ public class VirtualMachine
     public byte[] Memory { get; set; }
     public byte[] Gfx { get; set; }
 
-    private bool[] _keys;
     private uint _counter;
-    private IVmWindow? _window;
+    private readonly bool[] _keys;
+    private readonly IVmWindow? _window;
 
     public VirtualMachine(IVmWindow? window, string romPath) : this(window, File.ReadAllBytes(romPath)) { }
 
@@ -81,7 +81,7 @@ public class VirtualMachine
         // Load fonts.
         Fonts.CopyTo(Memory, 0x0);
 
-        // Load rom.
+        // Load ROM.
         rom.CopyTo(Memory, RomStart);
     }
 
@@ -111,7 +111,7 @@ public class VirtualMachine
         }
     }
 
-    public void EmulateCycle()
+    private void EmulateCycle()
     {
         OpCode = (ushort)(Memory[PC] << 8 | Memory[PC + 1]);
         PC += 2;

@@ -104,7 +104,7 @@ public class Window : GameWindow, IVmWindow
                 _isRunning = !_isRunning;
                 break;
             case Keys.S:
-                _virtualMachine?.EmulateCycle();
+                _virtualMachine?.EmulateCycles(1);
                 _virtualMachine?.DebugRegisters();
                 break;
             case Keys.Backspace:
@@ -120,7 +120,7 @@ public class Window : GameWindow, IVmWindow
         base.OnUpdateFrame(args);
         if (_isRunning)
         {
-            _virtualMachine?.EmulateCycle();
+            _virtualMachine?.EmulateCycles(1);
         }
     }
 
