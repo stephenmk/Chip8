@@ -19,7 +19,7 @@ namespace Chip8;
 public interface IWindow
 {
     public void Render();
-    public void ProcessEvents();
+    public bool ProcessEvents(double timeout);
     public void Beep();
 }
 
@@ -179,10 +179,5 @@ public class Window : GameWindow, IWindow
                 playingSound = false;
             }
         });
-    }
-
-    public void ProcessEvents()
-    {
-        throw new NotImplementedException();
     }
 }

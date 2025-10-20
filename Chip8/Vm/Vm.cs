@@ -546,7 +546,7 @@ public class Vm
                 }
             }
 
-            Window?.ProcessEvents();
+            Window?.ProcessEvents(1); // TODO: 1 is a guess. What should this timeout be?
         }
     }
 
