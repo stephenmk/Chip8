@@ -50,7 +50,7 @@ public class VirtualMachine
     public byte[] V { get; set; }
 
     public byte[] Memory { get; set; }
-    public byte[] Gfx { get; set; }
+    public byte[] Screen { get; set; }
 
     private uint _counter;
     private readonly bool[] _keys;
@@ -67,7 +67,7 @@ public class VirtualMachine
         Stack = new ushort[12];
         SP = 0;
         Memory = new byte[4096];
-        Gfx = new byte[64 * 32];
+        Screen = new byte[64 * 32];
         V = new byte[16];
 
         _keys = new bool[16];
@@ -90,7 +90,7 @@ public class VirtualMachine
         PC = RomStart;
         I = 0;
         SP = 0;
-        Gfx = new byte[64 * 32];
+        Screen = new byte[64 * 32];
     }
 
     public void KeyUp(byte key)
@@ -297,17 +297,17 @@ public class VirtualMachine
     {
         var output = new StringBuilder();
 
-        for (int i = 0; i < Gfx.Length; i += 64)
+        for (int i = 0; i < Screen.Length; i += 64)
         {
             output.Append($"0x{i:X3}:");
-            output.Append($" 0x{Gfx[i]:X2}");
-            output.Append($" 0x{Gfx[i + 1]:X2}");
-            output.Append($" 0x{Gfx[i + 2]:X2}");
-            output.Append($" 0x{Gfx[i + 3]:X2}");
-            output.Append($" 0x{Gfx[i + 4]:X2}");
-            output.Append($" 0x{Gfx[i + 5]:X2}");
-            output.Append($" 0x{Gfx[i + 6]:X2}");
-            output.Append($" 0x{Gfx[i + 7]:X2}");
+            output.Append($" 0x{Screen[i]:X2}");
+            output.Append($" 0x{Screen[i + 1]:X2}");
+            output.Append($" 0x{Screen[i + 2]:X2}");
+            output.Append($" 0x{Screen[i + 3]:X2}");
+            output.Append($" 0x{Screen[i + 4]:X2}");
+            output.Append($" 0x{Screen[i + 5]:X2}");
+            output.Append($" 0x{Screen[i + 6]:X2}");
+            output.Append($" 0x{Screen[i + 7]:X2}");
             output.AppendLine();
         }
 
@@ -317,7 +317,7 @@ public class VirtualMachine
             output.Append('|');
             for (int j = 0; j < 64; j++)
             {
-                output.Append(Gfx[i * 64 + j] > 0 ? "█" : " ");
+                output.Append(Screen[i * 64 + j] > 0 ? "█" : " ");
             }
             output.AppendLine("|");
         }
@@ -341,7 +341,7 @@ public class VirtualMachine
     /// </summary>
     private void OpCode00E0()
     {
-        Gfx = new byte[64 * 32];
+        Screen = new byte[64 * 32];
     }
 
     /// <summary>
@@ -407,13 +407,13 @@ public class VirtualMachine
                     var x = (V[X] + column) % 64;
 
                     // Collision detection: If the target pixel is already set then set the collision detection flag in register VF.
-                    if (Gfx[y * 64 + x] == 1)
+                    if (Screen[y * 64 + x] == 1)
                     {
                         V[0xF] = 1;
                     }
 
                     // Enable or disable the pixel (XOR operation).
-                    Gfx[y * 64 + x] ^= 1;
+                    Screen[y * 64 + x] ^= 1;
                 }
 
                 // Shift the next bit in from the right.
@@ -421,7 +421,7 @@ public class VirtualMachine
             }
         }
 
-        _window?.Render(Gfx);
+        _window?.Render(Screen);
     }
 
     /// <summary>

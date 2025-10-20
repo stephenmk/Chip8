@@ -14,7 +14,7 @@ public class TestOpCodes
         var vm = new VirtualMachine(null, rom);
         vm.EmulateCycles(1);
         var empty = new byte[64 * 32];
-        CollectionAssert.AreEqual(empty, vm.Gfx);
+        CollectionAssert.AreEqual(empty, vm.Screen);
     }
 
     [TestMethod]

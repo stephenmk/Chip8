@@ -15,7 +15,7 @@ public class TestRoms
         var expectedScreen = ExpectedScreen("c8_ok_screen.dat");
         var vm = new VirtualMachine(null, "c8_test.ch8");
         vm.EmulateCycles(512);
-        CollectionAssert.AreEqual(expectedScreen, vm.Gfx);
+        CollectionAssert.AreEqual(expectedScreen, vm.Screen);
     }
 
     [TestMethod]
@@ -24,7 +24,7 @@ public class TestRoms
         var expected = ExpectedScreen("bc_bon_screen.dat");
         var vm = new VirtualMachine(null, "BC_test.ch8");
         vm.EmulateCycles(512);
-        CollectionAssert.AreEqual(expected, vm.Gfx);
+        CollectionAssert.AreEqual(expected, vm.Screen);
     }
 
     [TestMethod]
@@ -33,6 +33,6 @@ public class TestRoms
         var expected = ExpectedScreen("corax89_all_ok_screen.dat");
         var vm = new VirtualMachine(null, "test_opcode.ch8");
         vm.EmulateCycles(512);
-        CollectionAssert.AreEqual(expected, vm.Gfx);
+        CollectionAssert.AreEqual(expected, vm.Screen);
     }
 }
