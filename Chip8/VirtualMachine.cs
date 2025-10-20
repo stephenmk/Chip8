@@ -45,9 +45,9 @@ public class VirtualMachine
 
     const ushort RomStart = 0x200;
 
-    private IWindow Window;
+    private IVmWindow Window;
 
-    public VirtualMachine(IWindow window, byte[] rom)
+    public VirtualMachine(IVmWindow window, byte[] rom)
     {
         PC = RomStart;
         OpCode = 0;
@@ -73,7 +73,7 @@ public class VirtualMachine
         rom.CopyTo(Memory, RomStart);
     }
 
-    public VirtualMachine(IWindow window, string rom) : this(window, File.ReadAllBytes(rom)) { }
+    public VirtualMachine(IVmWindow window, string rom) : this(window, File.ReadAllBytes(rom)) { }
 
     public void Reset()
     {

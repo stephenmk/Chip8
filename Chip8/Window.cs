@@ -12,15 +12,7 @@ using System.ComponentModel;
 
 namespace Chip8;
 
-// These methods gets called by the vm.
-public interface IWindow
-{
-    public void Render();
-    public bool ProcessEvents(double timeout);
-    public void Beep();
-}
-
-public class Window : GameWindow, IWindow
+public class Window : GameWindow, IVmWindow
 {
     bool running, playingSound;
 
