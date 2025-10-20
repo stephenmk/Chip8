@@ -27,24 +27,25 @@ public class Window : GameWindow, IWindow
 {
     bool running, playingSound;
 
-    private Dictionary<Keys, byte> KeyboardMap = new()
+    private static byte? KeyToByte(Keys key) => key switch
     {
-        { Keys.KeyPad0, 0x0 },
-        { Keys.KeyPad1, 0x1 },
-        { Keys.KeyPad2, 0x2 },
-        { Keys.KeyPad3, 0x3 },
-        { Keys.KeyPad4, 0x4 },
-        { Keys.KeyPad5, 0x5 },
-        { Keys.KeyPad6, 0x6 },
-        { Keys.KeyPad7, 0x7 },
-        { Keys.KeyPad8, 0x8 },
-        { Keys.KeyPad9, 0x9 },
-        { Keys.A, 0xA },
-        { Keys.B, 0xB },
-        { Keys.C, 0xC },
-        { Keys.D, 0xD },
-        { Keys.E, 0xE },
-        { Keys.F, 0xF }
+        Keys.KeyPad0 => 0x0,
+        Keys.KeyPad1 => 0x1,
+        Keys.KeyPad2 => 0x2,
+        Keys.KeyPad3 => 0x3,
+        Keys.KeyPad4 => 0x4,
+        Keys.KeyPad5 => 0x5,
+        Keys.KeyPad6 => 0x6,
+        Keys.KeyPad7 => 0x7,
+        Keys.KeyPad8 => 0x8,
+        Keys.KeyPad9 => 0x9,
+        Keys.A => 0xA,
+        Keys.B => 0xB,
+        Keys.C => 0xC,
+        Keys.D => 0xD,
+        Keys.E => 0xE,
+        Keys.F => 0xF,
+        _ => null,
     };
 
     private Vm vm;
@@ -78,7 +79,7 @@ public class Window : GameWindow, IWindow
     {
         base.OnKeyUp(e);
 
-        if (KeyboardMap.TryGetValue(e.Key, out byte value))
+        if (KeyToByte(e.Key) is byte value)
         {
             vm?.KeyUp(value);
         }
@@ -88,7 +89,7 @@ public class Window : GameWindow, IWindow
     {
         base.OnKeyDown(e);
 
-        if (KeyboardMap.TryGetValue(e.Key, out byte value))
+        if (KeyToByte(e.Key) is byte value)
         {
             vm?.KeyDown(value);
             return;
