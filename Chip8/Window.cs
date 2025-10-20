@@ -38,16 +38,13 @@ public class Window : GameWindow, IVmWindow
 
     private VirtualMachine? _virtualMachine;
 
-    public Window(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings)
-    {
-        FileDrop += Window_FileDrop;
-    }
+    public Window(GameWindowSettings gameSettings, NativeWindowSettings nativeSettings)
+        : base(gameSettings, nativeSettings) { }
 
-    private void Window_FileDrop(FileDropEventArgs obj)
+    protected override void OnFileDrop(FileDropEventArgs obj)
     {
         string rom = obj.FileNames[0];
         _virtualMachine = new VirtualMachine(this, rom);
-
         _isRunning = true;
     }
 
@@ -153,7 +150,6 @@ public class Window : GameWindow, IVmWindow
     protected override void OnClosing(CancelEventArgs e)
     {
         base.OnClosing(e);
-
         Environment.Exit(0);
     }
 

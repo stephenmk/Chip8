@@ -41,11 +41,11 @@ public class VirtualMachine
 
     private bool[] _keys;
     private uint _counter;
-    private IVmWindow _window;
+    private IVmWindow? _window;
 
-    public VirtualMachine(IVmWindow window, string rom) : this(window, File.ReadAllBytes(rom)) { }
+    public VirtualMachine(IVmWindow? window, string rom) : this(window, File.ReadAllBytes(rom)) { }
 
-    public VirtualMachine(IVmWindow window, byte[] rom)
+    public VirtualMachine(IVmWindow? window, byte[] rom)
     {
         PC = RomStart;
         OpCode = 0;
