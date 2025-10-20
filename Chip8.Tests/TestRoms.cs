@@ -268,7 +268,7 @@ public class TestRoms
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         ];
 
-        var vm = new VirtualMachine(null, Path.Join("Roms", "c8_test.c8"));
+        var vm = new VirtualMachine(null, "c8_test.ch8");
         vm.EmulateCycles(512);
 
         CollectionAssert.AreEqual(expected, vm.Gfx);
@@ -536,7 +536,7 @@ public class TestRoms
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         ];
 
-        var vm = new VirtualMachine(null, Path.Join("Roms", "BC_test.ch8"));
+        var vm = new VirtualMachine(null, "BC_test.ch8");
         vm.EmulateCycles(512);
 
         CollectionAssert.AreEqual(expected, vm.Gfx);
@@ -804,7 +804,7 @@ public class TestRoms
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
         ];
 
-        var vm = new VirtualMachine(null, Path.Join("Roms", "test_opcode.ch8"));
+        var vm = new VirtualMachine(null, "test_opcode.ch8");
         vm.EmulateCycles(512);
 
         CollectionAssert.AreEqual(expected, vm.Gfx);

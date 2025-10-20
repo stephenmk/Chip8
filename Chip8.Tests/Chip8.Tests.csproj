@@ -11,4 +11,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Chip8\Chip8.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="$(SolutionDir)\Roms\*test*.ch8">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
