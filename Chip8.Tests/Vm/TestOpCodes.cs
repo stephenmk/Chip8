@@ -1,11 +1,11 @@
-﻿using NUnit.Framework;
-using System.Linq;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Chip8.Tests
 {
+    [TestClass]
     public class TestOpCodes
     {
-        [Test]
+        [TestMethod]
         public void Test_OpCode00E0_ShouldClearScreen()
         {
             var vm = Vm.NewVm(null, new byte[] {
@@ -17,7 +17,7 @@ namespace Chip8.Tests
             CollectionAssert.AreEqual(empty, vm.Gfx);
         }
 
-        [Test]
+        [TestMethod]
         public void Test_OpCode00EE_ShouldSetPCTo0x202()
         {
             var vm = Vm.NewVm(null, new byte[] {
@@ -31,7 +31,7 @@ namespace Chip8.Tests
             Assert.AreEqual(0x202, vm.PC);
         }
 
-        [Test]
+        [TestMethod]
         public void Test_OpCode1NNN_ShouldSetPCTo0x123()
         {
             var vm = Vm.NewVm(null, new byte[] {
@@ -42,7 +42,7 @@ namespace Chip8.Tests
             Assert.AreEqual(0x123, vm.PC);
         }
 
-        [Test]
+        [TestMethod]
         public void Test_OpCode3XNN_ShouldSetPCTo0x206()
         {
             var vm = Vm.NewVm(null, new byte[] {
@@ -54,7 +54,7 @@ namespace Chip8.Tests
             Assert.AreEqual(0x206, vm.PC);
         }
 
-        [Test]
+        [TestMethod]
         public void Test_OpCode4XNN_ShouldSetPCTo0x206()
         {
             var vm = Vm.NewVm(null, new byte[] {
@@ -66,7 +66,7 @@ namespace Chip8.Tests
             Assert.AreEqual(0x206, vm.PC);
         }
 
-        [Test]
+        [TestMethod]
         public void Test_OpCode5XY0_ShouldSetPCTo0x208()
         {
             var vm = Vm.NewVm(null, new byte[] {
@@ -79,7 +79,7 @@ namespace Chip8.Tests
             Assert.AreEqual(0x208, vm.PC);
         }
 
-        [Test]
+        [TestMethod]
         public void Test_OpCode6XNN_ShouldSetV0To0xAA()
         {
             var vm = Vm.NewVm(null, new byte[] {
@@ -90,7 +90,7 @@ namespace Chip8.Tests
             Assert.AreEqual(0xAA, vm.V[0]);
         }
 
-        [Test]
+        [TestMethod]
         public void Test_OpCode8XY5_ShouldSetVFFlag0()
         {
             var vm = Vm.NewVm(null, new byte[] {
@@ -103,7 +103,7 @@ namespace Chip8.Tests
             Assert.AreEqual(0x0, vm.V[0xF]);
         }
 
-        [Test]
+        [TestMethod]
         public void Test_OpCode8XY5_ShouldSetVFFlag1()
         {
             var vm = Vm.NewVm(null, new byte[] {

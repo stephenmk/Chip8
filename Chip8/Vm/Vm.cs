@@ -11,8 +11,8 @@ namespace Chip8
 {
     public class Vm
     {
-        private byte[] Fonts =
-        {
+        private readonly byte[] Fonts =
+        [
               0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
               0x20, 0x60, 0x20, 0x20, 0x70, // 1
               0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
@@ -29,7 +29,7 @@ namespace Chip8
               0xE0, 0x90, 0x90, 0x90, 0xE0, // D
               0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
               0xF0, 0x80, 0xF0, 0x80, 0x80  // F
-        };
+        ];
 
         public ushort OpCode { get; set; }
         public ushort I { get; set; }
@@ -65,7 +65,7 @@ namespace Chip8
                 Gfx     = new byte[64 * 32],
                 V       = new byte[16],
                 Keys    = new bool[16],
-                
+
                 SoundTimer = 0,
                 DelayTimer = 0,
                 Counter    = 0,
@@ -80,7 +80,7 @@ namespace Chip8
 
         public static Vm NewVm(IWindow window, string rom)
         {
-            var bytes = File.ReadAllBytes(rom);            
+            var bytes = File.ReadAllBytes(rom);
             return NewVm(window, bytes);
         }
 
@@ -111,7 +111,7 @@ namespace Chip8
         {
             Keys[key] = true;
         }
-        
+
         public void EmulateCycles(int times)
         {
             foreach(var _ in Enumerable.Range(0, times))
@@ -129,7 +129,7 @@ namespace Chip8
             byte NN     = (byte)(OpCode & 0x00FF);
             byte N      = (byte)(OpCode & 0x000F);
             byte X      = (byte)((OpCode & 0x0F00) >> 8);
-            byte Y      = (byte)((OpCode & 0x00F0) >> 4);          
+            byte Y      = (byte)((OpCode & 0x00F0) >> 4);
 
             switch (OpCode & 0xF000)
             {

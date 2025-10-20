@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using OpenToolkit.Windowing.Desktop;
-using OpenToolkit.Windowing.Common;
-using OpenToolkit.Input;
-using OpenToolkit.Windowing.Common.Input;
-using OpenToolkit.Graphics.OpenGL;
-using OpenToolkit.Mathematics;
+using OpenTK.Windowing.Desktop;
+using OpenTK.Windowing.Common;
+using OpenTK.Input;
+using OpenTK.Windowing.Common.Input;
+using OpenTK.Graphics.OpenGL;
+using OpenTK.Windowing.GraphicsLibraryFramework;
+using OpenTK.Mathematics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace Chip8
 {
@@ -25,24 +27,24 @@ namespace Chip8
     {
         bool running, playingSound;
 
-        private Dictionary<Key, byte> KeyboardMap = new Dictionary<Key, byte>
+        private Dictionary<Keys, byte> KeyboardMap = new()
         {
-            { Key.Number0, 0x0 },
-            { Key.Number1, 0x1 },
-            { Key.Number2, 0x2 },
-            { Key.Number3, 0x3 },
-            { Key.Number4, 0x4 },
-            { Key.Number5, 0x5 },
-            { Key.Number6, 0x6 },
-            { Key.Number7, 0x7 },
-            { Key.Number8, 0x8 },
-            { Key.Number9, 0x9 },
-            { Key.A, 0xA },
-            { Key.B, 0xB },
-            { Key.C, 0xC },
-            { Key.D, 0xD },
-            { Key.E, 0xE },
-            { Key.F, 0xF }
+            { Keys.KeyPad0, 0x0 },
+            { Keys.KeyPad1, 0x1 },
+            { Keys.KeyPad2, 0x2 },
+            { Keys.KeyPad3, 0x3 },
+            { Keys.KeyPad4, 0x4 },
+            { Keys.KeyPad5, 0x5 },
+            { Keys.KeyPad6, 0x6 },
+            { Keys.KeyPad7, 0x7 },
+            { Keys.KeyPad8, 0x8 },
+            { Keys.KeyPad9, 0x9 },
+            { Keys.A, 0xA },
+            { Keys.B, 0xB },
+            { Keys.C, 0xC },
+            { Keys.D, 0xD },
+            { Keys.E, 0xE },
+            { Keys.F, 0xF }
         };
 
         private Vm vm;
@@ -75,11 +77,11 @@ namespace Chip8
         protected override void OnKeyUp(KeyboardKeyEventArgs e)
         {
             base.OnKeyUp(e);
-            
+
             if (KeyboardMap.TryGetValue(e.Key, out byte value))
             {
                 vm?.KeyUp(value);
-            }            
+            }
         }
 
         protected override void OnKeyDown(KeyboardKeyEventArgs e)
@@ -90,30 +92,30 @@ namespace Chip8
             {
                 vm?.KeyDown(value);
                 return;
-            }  
-            
+            }
+
             switch (e.Key)
             {
-                case Key.Escape:
+                case Keys.Escape:
                     Close();
                     break;
-                case Key.G:
+                case Keys.G:
                     vm?.DebugGraphics();
                     break;
-                case Key.M:
+                case Keys.M:
                     vm?.DebugMemory();
                     break;
-                case Key.R:
+                case Keys.R:
                     vm?.DebugRegisters();
                     break;
-                case Key.P:
+                case Keys.P:
                     running = !running;
                     break;
-                case Key.S:
+                case Keys.S:
                     vm?.EmulateCycle();
                     vm?.DebugRegisters();
                     break;
-                case Key.BackSpace:
+                case Keys.Backspace:
                     vm?.Reset();
                     break;
                 default:
@@ -134,7 +136,7 @@ namespace Chip8
         protected override void OnResize(ResizeEventArgs e)
         {
             base.OnResize(e);
-            
+
             GL.Viewport(0, 0, e.Width, e.Height);
         }
 
@@ -144,7 +146,7 @@ namespace Chip8
             if (buffer != null)
             {
                 GL.Clear(ClearBufferMask.ColorBufferBit);
-                
+
                 for (int y = 0; y < 32; y++)
                 {
                     for (int x = 0; x < 64; x++)
@@ -159,9 +161,9 @@ namespace Chip8
             }
         }
 
-        protected override void OnClosed()
+        protected override void OnClosing(CancelEventArgs e)
         {
-            base.OnClosed();
+            base.OnClosing(e);
 
             Environment.Exit(0);
         }
@@ -177,6 +179,11 @@ namespace Chip8
                     playingSound = false;
                 }
             });
+        }
+
+        public void ProcessEvents()
+        {
+            throw new NotImplementedException();
         }
     }
 }

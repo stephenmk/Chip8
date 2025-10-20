@@ -1,12 +1,12 @@
-using NUnit.Framework;
 using System.IO;
-using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Chip8.Tests
 {
+    [TestClass]
     public class TestRoms
     {
-        [Test]
+        [TestMethod]
         public void Test_RunC8TestRom_ShouldReturnOKScreen()
         {
             byte[] expected =
@@ -275,7 +275,7 @@ namespace Chip8.Tests
             CollectionAssert.AreEqual(expected, vm.Gfx);
         }
 
-        [Test]
+        [TestMethod]
         public void Test_RunBCTestRom_ShouldReturnBonScreen()
         {
             byte[] expected =
@@ -544,7 +544,7 @@ namespace Chip8.Tests
             CollectionAssert.AreEqual(expected, vm.Gfx);
         }
 
-        [Test]
+        [TestMethod]
         public void Test_RunCorax89TestRom_ShouldReturnAllOKScreen()
         {
             byte[] expected =

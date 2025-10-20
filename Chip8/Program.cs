@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-using OpenToolkit.Mathematics;
-using OpenToolkit.Windowing.Desktop;
-using OpenToolkit.Windowing.Common;
+using OpenTK.Mathematics;
+using OpenTK.Windowing.Desktop;
+using OpenTK.Windowing.Common;
 
 namespace Chip8
 {
