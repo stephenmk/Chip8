@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System.IO;
 using System.Linq;
 
 namespace Chip8.Tests
@@ -268,7 +269,7 @@ namespace Chip8.Tests
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
             };
 
-            var vm = Vm.NewVm(null, @"Roms\c8_test.c8");
+            var vm = Vm.NewVm(null, Path.Join("Roms", "c8_test.c8"));
             vm.EmulateCycles(512);
 
             CollectionAssert.AreEqual(expected, vm.Gfx);
@@ -537,7 +538,7 @@ namespace Chip8.Tests
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
             };
 
-            var vm = Vm.NewVm(null, @"Roms\BC_test.ch8");
+            var vm = Vm.NewVm(null, Path.Join("Roms", "BC_test.ch8"));
             vm.EmulateCycles(512);
 
             CollectionAssert.AreEqual(expected, vm.Gfx);
@@ -806,7 +807,7 @@ namespace Chip8.Tests
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
             };
 
-            var vm = Vm.NewVm(null, @"Roms\test_opcode.ch8");
+            var vm = Vm.NewVm(null, Path.Join("Roms", "test_opcode.ch8"));
             vm.EmulateCycles(512);
 
             CollectionAssert.AreEqual(expected, vm.Gfx);
