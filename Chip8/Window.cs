@@ -14,7 +14,8 @@ namespace Chip8;
 
 public class Window : GameWindow, IVmWindow
 {
-    bool running, playingSound;
+    private bool _isRunning;
+    private bool _isPlayingSound;
 
     private static byte? KeyToByte(Keys key) => key switch
     {
@@ -49,7 +50,7 @@ public class Window : GameWindow, IVmWindow
         string rom = obj.FileNames[0];
         vm = new VirtualMachine(this, rom);
 
-        running = true;
+        _isRunning = true;
     }
 
     protected override void OnLoad()
@@ -99,7 +100,7 @@ public class Window : GameWindow, IVmWindow
                 vm?.DebugRegisters();
                 break;
             case Keys.P:
-                running = !running;
+                _isRunning = !_isRunning;
                 break;
             case Keys.S:
                 vm?.EmulateCycle();
@@ -117,7 +118,7 @@ public class Window : GameWindow, IVmWindow
     {
         base.OnUpdateFrame(args);
 
-        if (running)
+        if (_isRunning)
         {
             vm?.EmulateCycle();
         }
@@ -162,12 +163,12 @@ public class Window : GameWindow, IVmWindow
     {
         Task.Run(() =>
         {
-            if (!playingSound)
+            if (!_isPlayingSound)
             {
-                playingSound = true;
+                _isPlayingSound = true;
                 if (OperatingSystem.IsWindows())
                     Console.Beep(440, 500);
-                playingSound = false;
+                _isPlayingSound = false;
             }
         });
     }
