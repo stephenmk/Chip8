@@ -1,9 +1,9 @@
 namespace Chip8;
 
 /// <summary>
-/// These methods get called by the virtual machine.
+/// Window methods expected by Chip8.
 /// </summary>
-public interface IVmWindow
+public interface IChip8Window
 {
     void Render(IList<byte> buffer);
     bool ProcessEvents(double timeout);

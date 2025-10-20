@@ -52,12 +52,18 @@ public class VirtualMachine
     public readonly byte[] _screen;
 
     private uint _cycleCountModTen;
+
+    /// <summary>
+    /// Pressed keys, ranging from 0 to F.
+    /// </summary>
     private readonly bool[] _keys;
-    private readonly IVmWindow? _window;
 
-    public VirtualMachine(IVmWindow? window, string romPath) : this(window, File.ReadAllBytes(romPath)) { }
+    private readonly IChip8Window? _window;
 
-    public VirtualMachine(IVmWindow? window, byte[] rom)
+    public VirtualMachine(IChip8Window? window, string romPath)
+        : this(window, File.ReadAllBytes(romPath)) { }
+
+    public VirtualMachine(IChip8Window? window, byte[] rom)
     {
         _pc = RomStart;
         _opCode = 0;
@@ -84,7 +90,7 @@ public class VirtualMachine
         rom.CopyTo(_memory, RomStart);
     }
 
-    public MachineState Snapshot() => new()
+    public StateSnapshot Snapshot() => new()
     {
         OpCode = _opCode,
         I = _i,

@@ -1,6 +1,6 @@
 namespace Chip8;
 
-public readonly ref struct MachineState
+public readonly ref struct StateSnapshot
 {
     public ushort OpCode { get; init; }
     public ushort I { get; init; }

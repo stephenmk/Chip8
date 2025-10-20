@@ -7,7 +7,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace Chip8;
 
-public class Window : GameWindow, IVmWindow
+public class Window : GameWindow, IChip8Window
 {
     private bool _isRunning;
     private bool _isPlayingSound;
