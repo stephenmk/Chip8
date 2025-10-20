@@ -1,5 +1,4 @@
 ﻿using System.Collections.Immutable;
-using System.Text;
 
 namespace Chip8;
 
@@ -38,7 +37,7 @@ public class VirtualMachine
     /// </summary>
     public ushort PC { get; private set; }
 
-    public ushort[] Stack { get; private set; }
+    public ushort[] Stack { get; private init; }
     public ushort SP { get; private set; }
 
     public byte DelayTimer { get; private set; }
@@ -47,10 +46,10 @@ public class VirtualMachine
     /// <summary>
     /// Variables (16 available, 0 to F)
     /// </summary>
-    public byte[] V { get; private set; }
+    public byte[] V { get; private init; }
 
-    public byte[] Memory { get; private set; }
-    public byte[] Screen { get; private set; }
+    public byte[] Memory { get; private init; }
+    public byte[] Screen { get; private init; }
 
     private uint _cycleCountModTen;
     private readonly bool[] _keys;
@@ -90,7 +89,15 @@ public class VirtualMachine
         PC = RomStart;
         I = 0;
         SP = 0;
-        Screen = new byte[64 * 32];
+        ClearScreen();
+    }
+
+    private void ClearScreen()
+    {
+        for (int i = 0; i < Screen.Length; i++)
+        {
+            Screen[i] = 0;
+        }
     }
 
     public void KeyUp(byte key)
@@ -269,7 +276,7 @@ public class VirtualMachine
     /// </summary>
     private void OpCode00E0()
     {
-        Screen = new byte[64 * 32];
+        ClearScreen();
     }
 
     /// <summary>
