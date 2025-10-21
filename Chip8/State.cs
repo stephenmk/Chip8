@@ -1,5 +1,6 @@
 // Copyright (c) 2020 Ron
 // Copyright (c) 2025 Stephen Kraus
+// Opcode method documentation comments from https://en.wikipedia.org/wiki/CHIP-8
 // SPDX-License-Identifier: MIT
 
 namespace Chip8;
@@ -96,9 +97,12 @@ internal class State
 
     public bool Beep { get => SoundTimer > 0; }
 
+    /// <remarks>
+    /// The update frequency is 600 Hz. Timers should be
+    /// updated at 60 Hz, so update timers every 10th cycle.
+    /// </remarks>
     public void UpdateTimers()
     {
-        // The update frequency is 600 Hz. Timers should be updated at 60 Hz, so update timers every 10th cycle.
         if ((++CycleCountModTen % 10) == 0)
         {
             CycleCountModTen = 0;
@@ -220,7 +224,8 @@ internal class State
     }
 
     /// <summary>
-    /// Calls machine code routine (RCA 1802 for COSMAC VIP) at address NNN. Not necessary for most ROMs.
+    /// Calls machine code routine (RCA 1802 for COSMAC VIP)
+    /// at address NNN. Not necessary for most ROMs.
     /// </summary>
     public void OpCode0NNN(ushort nnn)
     {
@@ -302,7 +307,8 @@ internal class State
     }
 
     /// <summary>
-    /// Adds Vy to Vx. VF is set to 1 when there's an overflow, and to 0 when there is not.
+    /// Adds Vy to Vx. VF is set to 1 when there's an overflow,
+    /// and to 0 when there is not.
     /// </summary>
     public void OpCode8XY4(byte x, byte y)
     {
@@ -318,7 +324,8 @@ internal class State
     }
 
     /// <summary>
-    /// Subtract Vy from Vx. VF is set to 0 when there's an underflow, and 1 when there is not.
+    /// Subtract Vy from Vx. VF is set to 0 when there's an underflow,
+    /// and 1 when there is not.
     /// </summary>
     public void OpCode8XY5(byte x, byte y)
     {
@@ -333,6 +340,10 @@ internal class State
         V[x] -= V[y];
     }
 
+    /// <summary>
+    /// Shifts Vx to the right by 1, then stores the least significant
+    /// bit of Vx prior to the shift into VF.
+    /// </summary>
     public void OpCode8XY6(byte x, byte _)
     {
         V[0xF] = (byte)(V[x] & 0x1);
@@ -340,7 +351,8 @@ internal class State
     }
 
     /// <summary>
-    /// Sets Vx to Vy minus Vx. VF is set to 0 when there's an underflow, and 1 when there is not.
+    /// Sets Vx to Vy minus Vx. VF is set to 0 when there's an underflow,
+    /// and 1 when there is not.
     /// </summary>
     public void OpCode8XY7(byte x, byte y)
     {
@@ -349,30 +361,44 @@ internal class State
         V[0xF] = (byte)(diff > 0 ? 1 : 0);
     }
 
+    /// <summary>
+    /// Shifts VX to the left by 1, then sets VF to 1 if the most significant
+    /// bit of VX prior to that shift was set, or to 0 if it was unset.
+    /// </summary>
     public void OpCode8XYE(byte x, byte _)
     {
         V[0xF] = (byte)((V[x] & 0x80) >> 7);
         V[x] <<= 0x1;
     }
 
+    /// <summary>
+    /// Jumps to the address NNN plus V0.
+    /// </summary>
     public void OpCodeBNNN(ushort nnn)
     {
         PC = (ushort)(nnn + V[0]);
     }
 
+    /// <summary>
+    /// Sets VX to the result of a bitwise and operation
+    /// on a random number (Typically: 0 to 255) and NN.
+    /// </summary>
     public void OpCodeCXNN(byte x, byte nn)
     {
         var random = new Random();
         V[x] = (byte)(random.Next(0, 0xFF) & nn);
     }
 
+    /// <summary>
+    /// Adds Vx to I. VF is not affected.
+    /// </summary>
     public void OpCodeFX1E(byte x)
     {
         I += V[x];
     }
 
     /// <summary>
-    /// Fills from V0 to VX (including VX) with values from memory, starting at address I.
+    /// Fills from V0 to Vx (including Vx) with values from memory, starting at address I.
     /// </summary>
     /// <remarks>
     /// The offset from I is increased by 1 for each value read, but I itself is left unmodified.
@@ -385,6 +411,12 @@ internal class State
         }
     }
 
+    /// <summary>
+    /// Stores from V0 to Vx (including Vx) in memory, starting at address I.
+    /// </summary>
+    /// <remarks>
+    /// The offset from I is increased by 1 for each value written, but I itself is left unmodified.
+    /// </remarks>
     public void OpCodeFX55(byte x)
     {
         for (int i = 0; i <= x; i++)
@@ -413,6 +445,12 @@ internal class State
         }
     }
 
+    /// <summary>
+    /// Skips the next instruction if the key stored in Vx is pressed.
+    /// </summary>
+    /// <remarks>
+    /// Usually the next instruction is a jump to skip a code block.
+    /// </remarks>
     public void OpCodeEX9E(byte x)
     {
         if (Keys[V[x]])
@@ -421,6 +459,12 @@ internal class State
         }
     }
 
+    /// <summary>
+    /// Skips the next instruction if the key stored in Vx is not pressed.
+    /// </summary>
+    /// <remarks>
+    /// Usually the next instruction is a jump to skip a code block.
+    /// </remarks>
     public void OpCodeEXA1(byte x)
     {
         if (!Keys[V[x]])
@@ -429,26 +473,43 @@ internal class State
         }
     }
 
+    /// <summary>
+    /// Sets the delay timer to Vx.
+    /// </summary>
     public void OpCodeFX15(byte x)
     {
         DelayTimer = V[x];
     }
 
+    /// <summary>
+    /// Sets the sound timer to Vx.
+    /// </summary>
     public void OpCodeFX18(byte x)
     {
         SoundTimer = V[x];
     }
 
+    /// <summary>
+    /// Sets Vx to the value of the delay timer.
+    /// </summary>
     public void OpCodeFX07(byte x)
     {
         V[x] = DelayTimer;
     }
 
+    /// <summary>
+    /// Sets I to the location of the sprite for the character in Vx.
+    /// </summary>
     public void OpCodeFX29(byte x)
     {
         I = (byte)(V[x] * 5);
     }
 
+    /// <summary>
+    /// Stores the binary-coded decimal representation of Vx, with the hundreds
+    /// digit in memory at location in I, the tens digit at location I+1, and
+    /// the ones digit at location I+2.
+    /// </summary>
     public void OpCodeFX33(byte x)
     {
         var number = V[x];
@@ -457,6 +518,12 @@ internal class State
         Memory[I + 2] = (byte)(number % 100 % 10);
     }
 
+    /// <summary>
+    /// Skips the next instruction if Vx does not equal Vy.
+    /// </summary>
+    /// <remarks>
+    /// Usually the next instruction is a jump to skip a code block
+    /// </remarks>
     public void OpCode9XY0(byte x, byte y)
     {
         if (V[x] != V[y])

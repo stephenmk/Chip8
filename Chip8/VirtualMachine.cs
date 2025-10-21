@@ -36,8 +36,8 @@ public class VirtualMachine
 
     public VirtualMachine(IChip8Window? window, byte[] rom)
     {
-        _state = new State(Fonts, rom);
         _window = window;
+        _state = new State(Fonts, rom);
     }
 
     public StateSnapshot Snapshot() => _state.Snapshot();
@@ -49,11 +49,11 @@ public class VirtualMachine
     {
         for (uint i = 0; i < times; i++)
         {
-            CycleOnce();
+            Cycle();
         }
     }
 
-    private void CycleOnce()
+    private void Cycle()
     {
         var opCode = _state.NextOpCode();
 
