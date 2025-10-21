@@ -1,5 +1,5 @@
 # Chip-8
-A CHIP-8 emulator written in C# (.NET Core)
+A CHIP-8 emulator written in C# (.NET 9.0)
 
 https://github.com/user-attachments/assets/89a3885f-59dc-465d-9e16-8ddaf357cff8
 
