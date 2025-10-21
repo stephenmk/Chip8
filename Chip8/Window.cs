@@ -21,6 +21,13 @@ public class Window : GameWindow, IChip8Window
     public Window(GameWindowSettings gameSettings, NativeWindowSettings nativeSettings)
         : base(gameSettings, nativeSettings) { }
 
+    public void LoadRom(string romPath)
+    {
+        _virtualMachine = new(this, romPath);
+        _debugger = new(_virtualMachine);
+        _isRunning = true;
+    }
+
     public void Render(ReadOnlySpan<byte> buffer)
     {
         if (buffer is not [])
@@ -64,9 +71,7 @@ public class Window : GameWindow, IChip8Window
     protected override void OnFileDrop(FileDropEventArgs obj)
     {
         string romPath = obj.FileNames[0];
-        _virtualMachine = new(this, romPath);
-        _debugger = new(_virtualMachine);
-        _isRunning = true;
+        LoadRom(romPath);
     }
 
     protected override void OnLoad()
