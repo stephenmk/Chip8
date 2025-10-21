@@ -4,6 +4,7 @@
 
 using System.ComponentModel;
 using System.Drawing;
+using System.Timers;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
@@ -14,7 +15,7 @@ namespace Chip8;
 public class Window : GameWindow, IChip8Window
 {
     private bool _isRunning;
-    private bool _isPlayingSound;
+    private byte _isInverted;
     private VirtualMachine? _virtualMachine;
     private Debugger? _debugger;
 
@@ -28,44 +29,37 @@ public class Window : GameWindow, IChip8Window
         _isRunning = true;
     }
 
-    public void Render(ReadOnlySpan<byte> buffer)
+    public void Render(IList<byte> buffer)
     {
-        if (buffer is not [])
+        GL.Clear(ClearBufferMask.ColorBufferBit);
+        for (int y = 0; y < 32; y++)
         {
-            GL.Clear(ClearBufferMask.ColorBufferBit);
-
-            for (int y = 0; y < 32; y++)
+            for (int x = 0; x < 64; x++)
             {
-                for (int x = 0; x < 64; x++)
+                if (buffer[y * 64 + x] != _isInverted)
                 {
-                    if (buffer[y * 64 + x] > 0)
-                    {
-                        GL.Rect(x, y, x + 1, y + 1);
-                    }
+                    GL.Rect(x, y, x + 1, y + 1);
                 }
             }
-            SwapBuffers();
         }
+        SwapBuffers();
     }
 
     public void Beep()
     {
-        Task.Run(() =>
+        if (_isInverted == 0)
         {
-            if (!_isPlayingSound)
-            {
-                _isPlayingSound = true;
-                if (OperatingSystem.IsWindows())
-                {
-                    Console.Beep(440, 500);
-                }
-                else
-                {
-                    Console.Beep();
-                }
-                _isPlayingSound = false;
-            }
-        });
+            _isInverted = 1;
+            var timer = new System.Timers.Timer(500);
+            timer.Elapsed += EndInversion;
+            timer.AutoReset = false;
+            timer.Enabled = true;
+        }
+    }
+
+    private void EndInversion(object? source, ElapsedEventArgs e)
+    {
+        _isInverted = 0;
     }
 
     protected override void OnFileDrop(FileDropEventArgs obj)

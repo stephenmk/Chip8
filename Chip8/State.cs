@@ -3,6 +3,8 @@
 // Opcode method documentation comments from https://en.wikipedia.org/wiki/CHIP-8
 // SPDX-License-Identifier: MIT
 
+using System.Collections.Immutable;
+
 namespace Chip8;
 
 internal class State
@@ -175,7 +177,7 @@ internal class State
     /// <remarks>
     /// Source: https://stackoverflow.com/questions/17346592/how-does-chip-8-graphics-rendered-on-screen
     /// </remarks>
-    public ReadOnlySpan<byte> OpCodeDXYN(byte X, byte Y, byte N)
+    public ImmutableArray<byte> OpCodeDXYN(byte X, byte Y, byte N)
     {
         // Initialize the collision detection as no collision detected (yet).
         V[0xF] = 0;
@@ -212,7 +214,8 @@ internal class State
                 sprite <<= 0x1;
             }
         }
-        return Screen.AsSpan();
+
+        return Screen.ToImmutableArray();
     }
 
     /// <summary>
