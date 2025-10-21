@@ -64,8 +64,7 @@ public class Window : GameWindow, IChip8Window
 
     protected override void OnFileDrop(FileDropEventArgs obj)
     {
-        string romPath = obj.FileNames[0];
-        LoadRom(romPath);
+        LoadRom(romPath: obj.FileNames[0]);
     }
 
     protected override void OnLoad()

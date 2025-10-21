@@ -1,8 +1,9 @@
 # Chip-8
 A CHIP-8 emulator written in C# (.NET Core)
 
-![Beautiful IBM logo](screenshot.png "Beautiful IBM logo")
-*IBM logo*
+https://github.com/user-attachments/assets/89a3885f-59dc-465d-9e16-8ddaf357cff8
+
+*Roms/invaders.ch8*
 
 > "CHIP-8 is an interpreted programming language, developed by Joseph Weisbecker. It was initially used on the COSMAC VIP and Telmac 1800 8-bit microcomputers in the mid-1970s. CHIP-8 programs are run on a CHIP-8 virtual machine. It was made to allow video games to be more easily programmed for these computers." — Wikipedia
 
