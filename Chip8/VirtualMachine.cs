@@ -72,6 +72,7 @@ public class VirtualMachine
                 _state.OpCode00EE();
                 break;
             case 0x0000:
+                // Not implemented.
                 _state.OpCode0NNN(nnn);
                 break;
             case 0x1000:
@@ -135,8 +136,8 @@ public class VirtualMachine
                 _state.OpCodeCXNN(x, nn);
                 break;
             case 0xD000:
-                var screen = _state.OpCodeDXYN(x, y, n);
-                _window?.Render(screen);
+                _state.OpCodeDXYN(x, y, n);
+                Render();
                 break;
             case 0xE000 when (opCode & 0x00FF) == 0x9E:
                 _state.OpCodeEX9E(x);
@@ -181,5 +182,12 @@ public class VirtualMachine
         {
             _window?.Beep();
         }
+    }
+
+    private void Render()
+    {
+        var state = Snapshot();
+        var screen = state.Screen.ToImmutableArray();
+        _window?.Render(screen);
     }
 }
