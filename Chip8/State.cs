@@ -14,10 +14,9 @@ internal class State
     private ushort PC;  // Program Counter
     private ushort SP;  // Stack Pointer
 
+    private bool Blocked;
     private byte DelayTimer;
     private byte SoundTimer;
-    private bool Blocked;
-    private bool Beep;
     private UInt128 CycleCount;
 
     private readonly byte[] V;  // Variables (16 available, 0 to F)
@@ -33,10 +32,10 @@ internal class State
         PC = RomStart;
         SP = 0;
 
-        CycleCount = 0;
+        Blocked = false;
         DelayTimer = 0;
         SoundTimer = 0;
-        Blocked = false;
+        CycleCount = 0;
 
         Stack = new ushort[12];
         Memory = new byte[4096];
@@ -57,10 +56,10 @@ internal class State
         MemoryAddress = I,
         ProgramCounter = PC,
         StackPointer = SP,
+        Blocked = Blocked,
         DelayTimer = DelayTimer,
         SoundTimer = SoundTimer,
         CycleCount = CycleCount,
-        Blocked = Blocked,
         Stack = Stack.AsSpan(),
         Variables = V.AsSpan(),
         Memory = Memory.AsSpan(),
@@ -79,10 +78,14 @@ internal class State
 
     public void Reset()
     {
+        OpCode = 0x0000;
         I = 0;
         PC = RomStart;
         SP = 0;
         Blocked = false;
+        DelayTimer = 0;
+        SoundTimer = 0;
+        CycleCount = 0;
         OpCode00E0();  // Clear screen
     }
 
@@ -100,7 +103,8 @@ internal class State
     /// The update frequency is 600 Hz. Timers should be
     /// updated at 60 Hz, so update timers every 10th cycle.
     /// </remarks>
-    public void UpdateTimers()
+    /// <returns><c>true</c> if beeping, otherwise <c>false</c>.</returns>
+    public bool UpdateTimers()
     {
         if ((++CycleCount % 10) == 0)
         {
@@ -110,31 +114,11 @@ internal class State
             }
             if (SoundTimer > 0)
             {
-                Beep = true;
                 SoundTimer--;
+                return true;
             }
         }
-    }
-
-    public bool PopBeep()
-    {
-        if (Beep)
-        {
-            Beep = false;
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    /// <summary>
-    /// Jumps to address NNN.
-    /// </summary>
-    public void OpCode1NNN(ushort nnn)
-    {
-        PC = nnn;
+        return false;
     }
 
     /// <summary>
@@ -157,90 +141,29 @@ internal class State
     }
 
     /// <summary>
+    /// Calls machine code routine (RCA 1802 for COSMAC VIP)
+    /// at address NNN. Not necessary for most ROMs.
+    /// </summary>
+    public void OpCode0NNN(ushort nnn)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Jumps to address NNN.
+    /// </summary>
+    public void OpCode1NNN(ushort nnn)
+    {
+        PC = nnn;
+    }
+
+    /// <summary>
     /// Calls subroutine at NNN.
     /// </summary>
     public void OpCode2NNN(ushort nnn)
     {
         Stack[++SP] = PC;
         PC = nnn;
-    }
-
-    /// <summary>
-    /// Sets I to the address NNN.
-    /// </summary>
-    public void OpCodeANNN(ushort nnn)
-    {
-        I = nnn;
-    }
-
-    /// <summary>
-    /// Sets Vx to NN.
-    /// </summary>
-    public void OpCode6XNN(ushort x, ushort nn)
-    {
-        V[x] = (byte)nn;
-    }
-
-    /// <summary>
-    /// Draws a sprite at coordinate (Vx, Vy) that has a width of 8 pixels and a height of N pixels.
-    /// </summary>
-    /// <remarks>
-    /// Source: https://stackoverflow.com/questions/17346592/how-does-chip-8-graphics-rendered-on-screen
-    /// </remarks>
-    public void OpCodeDXYN(byte X, byte Y, byte N)
-    {
-        // Initialize the collision detection as no collision detected (yet).
-        V[0xF] = 0;
-
-        // Draw N lines on the screen.
-        for (int line = 0; line < N; line++)
-        {
-            // y is the starting line Y + current line. If y is larger than the total width of the screen then wrap around (this is the modulo operation).
-            var y = (V[Y] + line) % 32;
-
-            // The current sprite being drawn, each line is a new sprite.
-            byte sprite = Memory[I + line];
-
-            // Each bit in the sprite is a pixel on or off.
-            for (int column = 0; column < 8; column++)
-            {
-                // Start with the current most significant bit. The next bit will be left shifted in from the right.
-                if ((sprite & 0x80) != 0)
-                {
-                    // Get the current x position and wrap around if needed.
-                    var x = (V[X] + column) % 64;
-
-                    // Collision detection: If the target pixel is already set then set the collision detection flag in register VF.
-                    if (Screen[y * 64 + x] == 1)
-                    {
-                        V[0xF] = 1;
-                    }
-
-                    // Enable or disable the pixel (XOR operation).
-                    Screen[y * 64 + x] ^= 1;
-                }
-
-                // Shift the next bit in from the right.
-                sprite <<= 0x1;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Adds NN to Vx (carry flag is not changed).
-    /// </summary>
-    public void OpCode7XNN(byte x, byte nn)
-    {
-        V[x] += nn;
-    }
-
-    /// <summary>
-    /// Calls machine code routine (RCA 1802 for COSMAC VIP)
-    /// at address NNN. Not necessary for most ROMs.
-    /// </summary>
-    public void OpCode0NNN(ushort nnn)
-    {
-        throw new NotImplementedException($"error: {OpCode:X4} has not been implemented.");
     }
 
     /// <summary>
@@ -283,6 +206,22 @@ internal class State
         {
             PC += 2;
         }
+    }
+
+    /// <summary>
+    /// Sets Vx to NN.
+    /// </summary>
+    public void OpCode6XNN(ushort x, ushort nn)
+    {
+        V[x] = (byte)nn;
+    }
+
+    /// <summary>
+    /// Adds NN to Vx (carry flag is not changed).
+    /// </summary>
+    public void OpCode7XNN(byte x, byte nn)
+    {
+        V[x] += nn;
     }
 
     /// <summary>
@@ -383,6 +322,28 @@ internal class State
     }
 
     /// <summary>
+    /// Skips the next instruction if Vx does not equal Vy.
+    /// </summary>
+    /// <remarks>
+    /// Usually the next instruction is a jump to skip a code block
+    /// </remarks>
+    public void OpCode9XY0(byte x, byte y)
+    {
+        if (V[x] != V[y])
+        {
+            PC += 2;
+        }
+    }
+
+    /// <summary>
+    /// Sets I to the address NNN.
+    /// </summary>
+    public void OpCodeANNN(ushort nnn)
+    {
+        I = nnn;
+    }
+
+    /// <summary>
     /// Jumps to the address NNN plus V0.
     /// </summary>
     public void OpCodeBNNN(ushort nnn)
@@ -401,57 +362,46 @@ internal class State
     }
 
     /// <summary>
-    /// Adds Vx to I. VF is not affected.
-    /// </summary>
-    public void OpCodeFX1E(byte x)
-    {
-        I += V[x];
-    }
-
-    /// <summary>
-    /// Fills from V0 to Vx (including Vx) with values from memory, starting at address I.
+    /// Draws a sprite at coordinate (Vx, Vy) that has a width of 8 pixels and a height of N pixels.
     /// </summary>
     /// <remarks>
-    /// The offset from I is increased by 1 for each value read, but I itself is left unmodified.
+    /// Source: https://stackoverflow.com/questions/17346592/how-does-chip-8-graphics-rendered-on-screen
     /// </remarks>
-    public void OpCodeFX65(byte x)
+    public void OpCodeDXYN(byte X, byte Y, byte N)
     {
-        for (int i = 0; i <= x; i++)
-        {
-            V[i] = Memory[I + i];
-        }
-    }
+        // Initialize the collision detection as no collision detected (yet).
+        V[0xF] = 0;
 
-    /// <summary>
-    /// Stores from V0 to Vx (including Vx) in memory, starting at address I.
-    /// </summary>
-    /// <remarks>
-    /// The offset from I is increased by 1 for each value written, but I itself is left unmodified.
-    /// </remarks>
-    public void OpCodeFX55(byte x)
-    {
-        for (int i = 0; i <= x; i++)
+        // Draw N lines on the screen.
+        for (int line = 0; line < N; line++)
         {
-            Memory[I + i] = V[i];
-        }
-    }
+            // y is the starting line Y + current line. If y is larger than the total width of the screen then wrap around (this is the modulo operation).
+            var y = (V[Y] + line) % 32;
 
-    /// <summary>
-    /// A key press is awaited, and then stored in Vx.
-    /// </summary>
-    /// <remarks>
-    /// Blocking operation; all instruction halted until next key event.
-    /// Delay and sound timers should continue processing.
-    /// </remarks>
-    public void OpCodeFX0A(byte x)
-    {
-        Blocked = true;
-        for (byte i = 0; i < 0xF; i++)
-        {
-            if (Keys[i])
+            // The current sprite being drawn, each line is a new sprite.
+            byte sprite = Memory[I + line];
+
+            // Each bit in the sprite is a pixel on or off.
+            for (int column = 0; column < 8; column++)
             {
-                V[x] = i;
-                Blocked = false;
+                // Start with the current most significant bit. The next bit will be left shifted in from the right.
+                if ((sprite & 0x80) != 0)
+                {
+                    // Get the current x position and wrap around if needed.
+                    var x = (V[X] + column) % 64;
+
+                    // Collision detection: If the target pixel is already set then set the collision detection flag in register VF.
+                    if (Screen[y * 64 + x] == 1)
+                    {
+                        V[0xF] = 1;
+                    }
+
+                    // Enable or disable the pixel (XOR operation).
+                    Screen[y * 64 + x] ^= 1;
+                }
+
+                // Shift the next bit in from the right.
+                sprite <<= 0x1;
             }
         }
     }
@@ -485,6 +435,34 @@ internal class State
     }
 
     /// <summary>
+    /// Sets Vx to the value of the delay timer.
+    /// </summary>
+    public void OpCodeFX07(byte x)
+    {
+        V[x] = DelayTimer;
+    }
+
+    /// <summary>
+    /// A key press is awaited, and then stored in Vx.
+    /// </summary>
+    /// <remarks>
+    /// Blocking operation; all instruction halted until next key event.
+    /// Delay and sound timers should continue processing.
+    /// </remarks>
+    public void OpCodeFX0A(byte x)
+    {
+        Blocked = true;
+        for (byte i = 0; i < 0xF; i++)
+        {
+            if (Keys[i])
+            {
+                V[x] = i;
+                Blocked = false;
+            }
+        }
+    }
+
+    /// <summary>
     /// Sets the delay timer to Vx.
     /// </summary>
     public void OpCodeFX15(byte x)
@@ -501,11 +479,11 @@ internal class State
     }
 
     /// <summary>
-    /// Sets Vx to the value of the delay timer.
+    /// Adds Vx to I. VF is not affected.
     /// </summary>
-    public void OpCodeFX07(byte x)
+    public void OpCodeFX1E(byte x)
     {
-        V[x] = DelayTimer;
+        I += V[x];
     }
 
     /// <summary>
@@ -530,16 +508,30 @@ internal class State
     }
 
     /// <summary>
-    /// Skips the next instruction if Vx does not equal Vy.
+    /// Stores from V0 to Vx (including Vx) in memory, starting at address I.
     /// </summary>
     /// <remarks>
-    /// Usually the next instruction is a jump to skip a code block
+    /// The offset from I is increased by 1 for each value written, but I itself is left unmodified.
     /// </remarks>
-    public void OpCode9XY0(byte x, byte y)
+    public void OpCodeFX55(byte x)
     {
-        if (V[x] != V[y])
+        for (int i = 0; i <= x; i++)
         {
-            PC += 2;
+            Memory[I + i] = V[i];
+        }
+    }
+
+    /// <summary>
+    /// Fills from V0 to Vx (including Vx) with values from memory, starting at address I.
+    /// </summary>
+    /// <remarks>
+    /// The offset from I is increased by 1 for each value read, but I itself is left unmodified.
+    /// </remarks>
+    public void OpCodeFX65(byte x)
+    {
+        for (int i = 0; i <= x; i++)
+        {
+            V[i] = Memory[I + i];
         }
     }
 }

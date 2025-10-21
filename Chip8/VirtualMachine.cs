@@ -72,7 +72,6 @@ public class VirtualMachine
                 _state.OpCode00EE();
                 break;
             case 0x0000:
-                // Not implemented.
                 _state.OpCode0NNN(nnn);
                 break;
             case 0x1000:
@@ -176,9 +175,7 @@ public class VirtualMachine
                 throw new InvalidOperationException($"Invalid OpCode {opCode:X4}");
         }
 
-        _state.UpdateTimers();
-
-        if (_state.PopBeep())
+        if (_state.UpdateTimers())
         {
             _window?.Beep();
         }
