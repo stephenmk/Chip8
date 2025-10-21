@@ -17,9 +17,9 @@ public class Window : GameWindow, IChip8Window
     public Window(GameWindowSettings gameSettings, NativeWindowSettings nativeSettings)
         : base(gameSettings, nativeSettings) { }
 
-    public void Render(IList<byte> buffer)
+    public void Render(ReadOnlySpan<byte> buffer)
     {
-        if (buffer != null)
+        if (buffer is not [])
         {
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
