@@ -15,20 +15,14 @@ I also refactored and tidied up the program to make it a little more object-orie
 
 ## Running
 
-Keyboard keys 0–9, A–F maps to the corresponding chip8 keys.
+Keyboard keys 0–9, A–F map to the corresponding chip8 keys.
 
-Keyboard shortcuts:
-
-<kbd>Esc</kbd> = Exit
-
-<kbd>Backspace</kbd> = Reset
-
-<kbd>P</kbd>     = Toggle pause
-
-<kbd>S</kbd>     = Pause, step, and print register contents to console
-
-<kbd>R</kbd>     = Print register contents to console
-
-<kbd>G</kbd>     = Print screen contents to console
-
-<kbd>M</kbd>     = Print memory contents to console
+Key | Shortcut
+-- | --
+<kbd>Esc</kbd> | Exit
+<kbd>Backspace</kbd> | Reset
+<kbd>P</kbd> | Toggle pause
+<kbd>S</kbd> | Pause, step, and print register contents to console
+<kbd>R</kbd> | Print register contents to console
+<kbd>G</kbd> | Print screen contents to console
+<kbd>M</kbd> | Print memory contents to console
