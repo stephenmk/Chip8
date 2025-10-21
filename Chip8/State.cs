@@ -47,8 +47,8 @@ internal class State
         SP = 0;
 
         CycleCountModTen = 0;
-        SoundTimer = 0;
         DelayTimer = 0;
+        SoundTimer = 0;
         Blocked = false;
 
         Stack = new ushort[12];
@@ -67,13 +67,14 @@ internal class State
     public StateSnapshot Snapshot() => new()
     {
         OpCode = OpCode,
-        I = I,
-        PC = PC,
-        Stack = Stack.AsSpan(),
-        SP = SP,
+        MemoryAddress = I,
+        ProgramCounter = PC,
+        StackPointer = SP,
         DelayTimer = DelayTimer,
         SoundTimer = SoundTimer,
-        V = V.AsSpan(),
+        Blocked = Blocked,
+        Stack = Stack.AsSpan(),
+        Variables = V.AsSpan(),
         Memory = Memory.AsSpan(),
         Screen = Screen.AsSpan(),
     };
@@ -346,7 +347,7 @@ internal class State
         V[x] -= V[y];
     }
 
-    public void OpCode8XY6(byte x)
+    public void OpCode8XY6(byte x, byte _)
     {
         V[0xF] = (byte)(V[x] & 0x1);
         V[x] >>= 0x1;
@@ -362,7 +363,7 @@ internal class State
         V[0xF] = (byte)(diff > 0 ? 1 : 0);
     }
 
-    public void OpCode8XYE(byte x)
+    public void OpCode8XYE(byte x, byte _)
     {
         V[0xF] = (byte)((V[x] & 0x80) >> 7);
         V[x] <<= 0x1;

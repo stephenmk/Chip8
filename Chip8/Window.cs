@@ -11,7 +11,6 @@ public class Window : GameWindow, IChip8Window
 {
     private bool _isRunning;
     private bool _isPlayingSound;
-    private readonly bool _isWindows = OperatingSystem.IsWindows();
     private VirtualMachine? _virtualMachine;
     private Debugger? _debugger;
 
@@ -45,7 +44,7 @@ public class Window : GameWindow, IChip8Window
             if (!_isPlayingSound)
             {
                 _isPlayingSound = true;
-                if (_isWindows)
+                if (OperatingSystem.IsWindows())
                 {
                     Console.Beep(440, 500);
                 }

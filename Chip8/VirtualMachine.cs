@@ -36,10 +36,10 @@ public class VirtualMachine
         _window = window;
     }
 
+    public StateSnapshot Snapshot() => _state.Snapshot();
     public void KeyUp(byte key) => _state.UnsetKey(key);
     public void KeyDown(byte key) => _state.SetKey(key);
     public void Reset() => _state.Reset();
-    public StateSnapshot Snapshot() => _state.Snapshot();
 
     public void Cycle(uint times)
     {
@@ -110,13 +110,13 @@ public class VirtualMachine
                 _state.OpCode8XY5(x, y);
                 break;
             case 0x8000 when (opCode & 0x000F) == 6:
-                _state.OpCode8XY6(x);
+                _state.OpCode8XY6(x, y);
                 break;
             case 0x8000 when (opCode & 0x000F) == 7:
                 _state.OpCode8XY7(x, y);
                 break;
             case 0x8000 when (opCode & 0x000F) == 0xE:
-                _state.OpCode8XYE(x);
+                _state.OpCode8XYE(x, y);
                 break;
             case 0x9000:
                 _state.OpCode9XY0(x, y);

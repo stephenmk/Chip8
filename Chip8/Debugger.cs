@@ -4,26 +4,26 @@ namespace Chip8;
 
 public class Debugger
 {
-    private readonly VirtualMachine _vm;
+    private readonly VirtualMachine _virtualMachine;
 
-    public Debugger(VirtualMachine vm)
+    public Debugger(VirtualMachine virtualMachine)
     {
-        _vm = vm;
+        _virtualMachine = virtualMachine;
     }
 
     public void PrintRegisters()
     {
-        var state = _vm.Snapshot();
+        var state = _virtualMachine.Snapshot();
         var output = new StringBuilder();
 
-        output.AppendLine($"PC              0x{state.PC:X4}");
+        output.AppendLine($"PC              0x{state.ProgramCounter:X4}");
         output.AppendLine($"OpCode          0x{state.OpCode:X4}");
-        output.AppendLine($"I               0x{state.I:X4}");
-        output.AppendLine($"sp              0x{state.SP:X4}");
+        output.AppendLine($"I               0x{state.MemoryAddress:X4}");
+        output.AppendLine($"sp              0x{state.StackPointer:X4}");
 
         foreach (var register in Enumerable.Range(0, 16))
         {
-            output.AppendLine($"V{register:X}              0x{state.V[register]:X2}");
+            output.AppendLine($"V{register:X}              0x{state.Variables[register]:X2}");
         }
 
         output.AppendLine($"DelayTimer      {state.DelayTimer}");
@@ -34,7 +34,7 @@ public class Debugger
 
     public void PrintMemory()
     {
-        var state = _vm.Snapshot();
+        var state = _virtualMachine.Snapshot();
         var output = new StringBuilder();
 
         for (int i = 0; i <= 0xfff; i += 8)
@@ -56,7 +56,7 @@ public class Debugger
 
     public void PrintScreen()
     {
-        var state = _vm.Snapshot();
+        var state = _virtualMachine.Snapshot();
         var output = new StringBuilder();
 
         for (int i = 0; i < state.Screen.Length; i += 64)
