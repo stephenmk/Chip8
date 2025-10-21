@@ -21,10 +21,10 @@ public class Debugger
         Console.WriteLine
         (
             $"""
-            PC              0x{state.ProgramCounter:X4}
             OpCode          0x{state.OpCode:X4}
             I               0x{state.MemoryAddress:X4}
-            sp              0x{state.StackPointer:X4}
+            PC              0x{state.ProgramCounter:X4}
+            SP              0x{state.StackPointer:X4}
             V{0x0:X}              0x{state.Variables[0x0]:X2}
             V{0x1:X}              0x{state.Variables[0x1]:X2}
             V{0x2:X}              0x{state.Variables[0x2]:X2}
