@@ -16,11 +16,11 @@ internal class State
     private ushort PC;  // Program Counter
     private ushort SP;  // Stack Pointer
 
-    private ushort CycleCountModTen;
     private byte DelayTimer;
     private byte SoundTimer;
     private bool Blocked;
     private bool Beep;
+    private UInt128 CycleCount;
 
     private readonly byte[] V;  // Variables (16 available, 0 to F)
     private readonly byte[] Memory;
@@ -35,7 +35,7 @@ internal class State
         PC = RomStart;
         SP = 0;
 
-        CycleCountModTen = 0;
+        CycleCount = 0;
         DelayTimer = 0;
         SoundTimer = 0;
         Blocked = false;
@@ -61,7 +61,7 @@ internal class State
         StackPointer = SP,
         DelayTimer = DelayTimer,
         SoundTimer = SoundTimer,
-        CycleCountModTen = CycleCountModTen,
+        CycleCount = CycleCount,
         Blocked = Blocked,
         Stack = Stack.AsSpan(),
         Variables = V.AsSpan(),
@@ -104,9 +104,8 @@ internal class State
     /// </remarks>
     public void UpdateTimers()
     {
-        if ((++CycleCountModTen % 10) == 0)
+        if ((++CycleCount % 10) == 0)
         {
-            CycleCountModTen = 0;
             if (DelayTimer > 0)
             {
                 DelayTimer--;
