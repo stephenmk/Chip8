@@ -29,16 +29,40 @@ public class Window : GameWindow, IChip8Window
         _isRunning = true;
     }
 
-    public void Render(IList<byte> buffer)
+    protected override void OnLoad()
+    {
+        base.OnLoad();
+        GL.ClearColor(Color.Black);
+        GL.Color3(Color.White);
+        GL.Ortho(0, 64, 32, 0, -1, 1);
+        GL.Clear(ClearBufferMask.ColorBufferBit);
+        SwapBuffers();
+    }
+
+    protected override void OnUpdateFrame(FrameEventArgs e)
+    {
+        base.OnUpdateFrame(e);
+        if (_isRunning)
+        {
+            _virtualMachine?.Cycle(1);
+        }
+    }
+
+    protected override void OnRenderFrame(FrameEventArgs e)
     {
         GL.Clear(ClearBufferMask.ColorBufferBit);
-        for (int y = 0; y < 32; y++)
+        if (_virtualMachine is not null)
         {
-            for (int x = 0; x < 64; x++)
+            var state = _virtualMachine.Snapshot();
+            var buffer = state.Screen;
+            for (int y = 0; y < 32; y++)
             {
-                if (buffer[y * 64 + x] != _isInverted)
+                for (int x = 0; x < 64; x++)
                 {
-                    GL.Rect(x, y, x + 1, y + 1);
+                    if (buffer[y * 64 + x] != _isInverted)
+                    {
+                        GL.Rect(x, y, x + 1, y + 1);
+                    }
                 }
             }
         }
@@ -65,16 +89,6 @@ public class Window : GameWindow, IChip8Window
     protected override void OnFileDrop(FileDropEventArgs obj)
     {
         LoadRom(romPath: obj.FileNames[0]);
-    }
-
-    protected override void OnLoad()
-    {
-        base.OnLoad();
-        GL.ClearColor(Color.Black);
-        GL.Color3(Color.White);
-        GL.Ortho(0, 64, 32, 0, -1, 1);
-        GL.Clear(ClearBufferMask.ColorBufferBit);
-        SwapBuffers();
     }
 
     protected override void OnKeyUp(KeyboardKeyEventArgs e)
@@ -123,15 +137,6 @@ public class Window : GameWindow, IChip8Window
                 break;
             default:
                 break;
-        }
-    }
-
-    protected override void OnUpdateFrame(FrameEventArgs args)
-    {
-        base.OnUpdateFrame(args);
-        if (_isRunning)
-        {
-            _virtualMachine?.Cycle(1);
         }
     }
 
