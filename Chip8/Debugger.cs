@@ -14,22 +14,33 @@ public class Debugger
     public void PrintRegisters()
     {
         var state = _virtualMachine.Snapshot();
-        var output = new StringBuilder();
-
-        output.AppendLine($"PC              0x{state.ProgramCounter:X4}");
-        output.AppendLine($"OpCode          0x{state.OpCode:X4}");
-        output.AppendLine($"I               0x{state.MemoryAddress:X4}");
-        output.AppendLine($"sp              0x{state.StackPointer:X4}");
-
-        foreach (var register in Enumerable.Range(0, 16))
-        {
-            output.AppendLine($"V{register:X}              0x{state.Variables[register]:X2}");
-        }
-
-        output.AppendLine($"DelayTimer      {state.DelayTimer}");
-        output.AppendLine($"SoundTimer      {state.SoundTimer}");
-
-        Console.WriteLine(output);
+        Console.WriteLine
+        (
+            $"""
+            PC              0x{state.ProgramCounter:X4}
+            OpCode          0x{state.OpCode:X4}
+            I               0x{state.MemoryAddress:X4}
+            sp              0x{state.StackPointer:X4}
+            V{0x0:X}              0x{state.Variables[0x0]:X2}
+            V{0x1:X}              0x{state.Variables[0x1]:X2}
+            V{0x2:X}              0x{state.Variables[0x2]:X2}
+            V{0x3:X}              0x{state.Variables[0x3]:X2}
+            V{0x4:X}              0x{state.Variables[0x4]:X2}
+            V{0x5:X}              0x{state.Variables[0x5]:X2}
+            V{0x6:X}              0x{state.Variables[0x6]:X2}
+            V{0x7:X}              0x{state.Variables[0x7]:X2}
+            V{0x8:X}              0x{state.Variables[0x8]:X2}
+            V{0x9:X}              0x{state.Variables[0x9]:X2}
+            V{0xA:X}              0x{state.Variables[0xA]:X2}
+            V{0xB:X}              0x{state.Variables[0xB]:X2}
+            V{0xC:X}              0x{state.Variables[0xC]:X2}
+            V{0xD:X}              0x{state.Variables[0xD]:X2}
+            V{0xE:X}              0x{state.Variables[0xE]:X2}
+            V{0xF:X}              0x{state.Variables[0xF]:X2}
+            DelayTimer      {state.DelayTimer}
+            SoundTimer      {state.SoundTimer}
+            """
+        );
     }
 
     public void PrintMemory()
