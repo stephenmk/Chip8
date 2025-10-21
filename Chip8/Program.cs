@@ -49,7 +49,7 @@ class Program
             Title = "Chip8 Emulator"
         };
 
-        var window = new Window(gameSettings, nativeSettings);
+        using var window = new Window(gameSettings, nativeSettings);
 
         if (romFile is not null)
         {
