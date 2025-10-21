@@ -1,4 +1,8 @@
-﻿using System.Collections.Immutable;
+﻿// Copyright (c) 2020 Ron
+// Copyright (c) 2025 Stephen Kraus
+// SPDX-License-Identifier: MIT
+
+using System.Collections.Immutable;
 
 namespace Chip8;
 

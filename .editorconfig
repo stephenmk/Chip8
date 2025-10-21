@@ -1,2 +1,3 @@
 [*.cs]
 csharp_style_prefer_primary_constructors = false
+file_header_template = Copyright (c) 2020 Ron\nCopyright (c) 2025 Stephen Kraus\nSPDX-License-Identifier: MIT

@@ -1,4 +1,8 @@
-﻿using System.ComponentModel;
+﻿// Copyright (c) 2020 Ron
+// Copyright (c) 2025 Stephen Kraus
+// SPDX-License-Identifier: MIT
+
+using System.ComponentModel;
 using System.Drawing;
 using OpenTK.Graphics.OpenGL;
 using OpenTK.Windowing.Common;
