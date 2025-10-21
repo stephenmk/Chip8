@@ -43,6 +43,7 @@ public class Debugger
             V{0xF:X}              0x{state.Variables[0xF]:X2}
             DelayTimer      {state.DelayTimer}
             SoundTimer      {state.SoundTimer}
+
             """
         );
     }

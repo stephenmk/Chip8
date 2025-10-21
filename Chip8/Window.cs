@@ -115,6 +115,7 @@ public class Window : GameWindow, IChip8Window
                 _isRunning = !_isRunning;
                 break;
             case Keys.S:
+                _isRunning = false;
                 _virtualMachine?.Cycle(1);
                 _debugger?.PrintRegisters();
                 break;

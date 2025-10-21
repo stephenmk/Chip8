@@ -22,12 +22,12 @@ Keyboard shortcuts:
 
 <kbd>Backspace</kbd> = Reset
 
-<kbd>P</kbd>     = Pause / Play execution
+<kbd>P</kbd>     = Toggle pause
 
-<kbd>S</kbd>     = Single step
+<kbd>S</kbd>     = Pause, step, and print register contents to console
 
-<kbd>R</kbd>     = Dump registers to console
+<kbd>R</kbd>     = Print register contents to console
 
-<kbd>G</kbd>     = Dump screen contents to console
+<kbd>G</kbd>     = Print screen contents to console
 
 <kbd>M</kbd>     = Print memory contents to console
