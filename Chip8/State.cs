@@ -20,6 +20,7 @@ internal class State
     private byte DelayTimer;
     private byte SoundTimer;
     private bool Blocked;
+    private bool Beep;
 
     private readonly byte[] V;  // Variables (16 available, 0 to F)
     private readonly byte[] Memory;
@@ -97,8 +98,6 @@ internal class State
         return OpCode;
     }
 
-    public bool Beep { get => SoundTimer > 0; }
-
     /// <remarks>
     /// The update frequency is 600 Hz. Timers should be
     /// updated at 60 Hz, so update timers every 10th cycle.
@@ -114,8 +113,22 @@ internal class State
             }
             if (SoundTimer > 0)
             {
+                Beep = true;
                 SoundTimer--;
             }
+        }
+    }
+
+    public bool PopBeep()
+    {
+        if (Beep)
+        {
+            Beep = false;
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 

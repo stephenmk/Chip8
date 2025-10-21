@@ -175,11 +175,11 @@ public class VirtualMachine
                 throw new InvalidOperationException($"Invalid OpCode {opCode:X4}");
         }
 
-        if (_state.Beep)
+        _state.UpdateTimers();
+
+        if (_state.PopBeep())
         {
             _window?.Beep();
         }
-
-        _state.UpdateTimers();
     }
 }
