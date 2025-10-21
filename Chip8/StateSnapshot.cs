@@ -11,6 +11,7 @@ public readonly ref struct StateSnapshot
     public ushort StackPointer { get; init; }
     public byte DelayTimer { get; init; }
     public byte SoundTimer { get; init; }
+    public ushort CycleCountModTen { get; init; }
     public bool Blocked { get; init; }
     public ReadOnlySpan<ushort> Stack { get; init; }
     public ReadOnlySpan<byte> Variables { get; init; }

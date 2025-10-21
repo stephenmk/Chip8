@@ -5,39 +5,20 @@ internal class State
     private const ushort RomStart = 0x200;
 
     private ushort OpCode;
+    private ushort I;  // 12bit register (for memory address)
+    private ushort PC;  // Program Counter
+    private ushort SP;  // Stack Pointer
 
-    /// <summary>
-    /// 12bit register (for memory address)
-    /// </summary>
-    private ushort I;
-
-    /// <summary>
-    /// Program Counter
-    /// </summary>
-    private ushort PC;
-
-    /// <summary>
-    /// Stack Pointer
-    /// </summary>
-    private ushort SP;
-
-    private uint CycleCountModTen;
+    private ushort CycleCountModTen;
     private byte DelayTimer;
     private byte SoundTimer;
     private bool Blocked;
 
-    /// <summary>
-    /// Variables (16 available, 0 to F)
-    /// </summary>
-    private readonly byte[] V;
+    private readonly byte[] V;  // Variables (16 available, 0 to F)
     private readonly byte[] Memory;
     private readonly byte[] Screen;
     private readonly ushort[] Stack;
-
-    /// <summary>
-    /// Pressed keys, ranging from 0 to F.
-    /// </summary>
-    private readonly bool[] Keys;
+    private readonly bool[] Keys;  // Pressed keys, ranging from 0 to F.
 
     public State(IList<byte> font, IList<byte> rom)
     {
@@ -72,6 +53,7 @@ internal class State
         StackPointer = SP,
         DelayTimer = DelayTimer,
         SoundTimer = SoundTimer,
+        CycleCountModTen = CycleCountModTen,
         Blocked = Blocked,
         Stack = Stack.AsSpan(),
         Variables = V.AsSpan(),
@@ -108,6 +90,8 @@ internal class State
         return OpCode;
     }
 
+    public bool Beep { get => SoundTimer > 0; }
+
     public void UpdateTimers()
     {
         // The update frequency is 600 Hz. Timers should be updated at 60 Hz, so update timers every 10th cycle.
@@ -124,8 +108,6 @@ internal class State
             }
         }
     }
-
-    public bool Beep { get => SoundTimer > 0; }
 
     /// <summary>
     /// Jumps to address NNN.
