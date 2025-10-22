@@ -34,6 +34,7 @@ public class Window : GameWindow, IChip8Window
     {
         base.OnLoad();
         _graphics = new WindowGraphics(PixelCount);
+        SwapBuffers();
     }
 
     protected override void OnUpdateFrame(FrameEventArgs e)
@@ -47,7 +48,14 @@ public class Window : GameWindow, IChip8Window
 
     protected override void OnRenderFrame(FrameEventArgs e)
     {
-        _graphics?.Render(_pixels);
+        if (_isRunning)
+        {
+            _graphics?.Render(_pixels);
+        }
+        else
+        {
+            _graphics?.ClearScreen();
+        }
         SwapBuffers();
     }
 

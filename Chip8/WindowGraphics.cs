@@ -13,7 +13,7 @@ public class WindowGraphics : IDisposable
 
     public WindowGraphics(uint textureSize)
     {
-        GL.ClearColor(Color.Black);
+        GL.ClearColor(Color.CornflowerBlue);
 
         // Create and bind VAO/VBO/EBO
         int vertexArray = GL.GenVertexArray();
@@ -68,15 +68,20 @@ public class WindowGraphics : IDisposable
         GL.Clear(ClearBufferMask.ColorBufferBit);
         _shader?.Use();
 
-        var byteArray = pixels
+        var bytePixels = pixels
             .Select(static pixel => (byte)(pixel ? 0xFF : 0x00))
             .ToArray();
 
-        GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, 64, 32, PixelFormat.Red, PixelType.UnsignedByte, byteArray);
+        GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, 64, 32, PixelFormat.Red, PixelType.UnsignedByte, bytePixels);
 
         // 6: length of `uint[] indices`
         // 0: pointer to location of the `indices` array.
         GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+    }
+
+    public virtual void ClearScreen()
+    {
+        GL.Clear(ClearBufferMask.ColorBufferBit);
     }
 
     public virtual void Resize(int x, int y, int width, int height)
