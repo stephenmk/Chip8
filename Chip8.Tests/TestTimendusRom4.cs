@@ -6,16 +6,16 @@ using static Chip8.Tests.TestMethods;
 namespace Chip8.Tests;
 
 [TestClass]
-public class TestTimendusRom3
+public class TestTimendusRom4
 {
     [TestMethod]
-    public void Test_3_corax_plus()
+    public void Test_4_flags()
     {
         TestScreen
         (
-            romFilename: "3-corax+.ch8",
-            cycles: 308,
-            screenFilename: "3-corax+-success.txt"
+            romFilename: "4-flags.ch8",
+            cycles: 952,
+            screenFilename: "4-flags-success.txt"
         );
     }
 }
