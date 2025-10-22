@@ -16,7 +16,7 @@ public class TestOpCodes
         [
             0x00, 0xE0  // 0x00E0 - Clear the screen
         ];
-        var empty = new byte[64 * 32];
+        var empty = new bool[64 * 32];
         TestScreen(rom, cycles: 1, expected: empty);
     }
 

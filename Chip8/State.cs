@@ -21,7 +21,7 @@ internal class State
 
     private readonly byte[] V;  // Variables (16 available, 0 to F)
     private readonly byte[] Memory;
-    private readonly byte[] Screen;
+    private readonly bool[] Screen;
     private readonly ushort[] Stack;
     private readonly bool[] Keys;  // Pressed keys, ranging from 0 to F.
 
@@ -39,7 +39,7 @@ internal class State
 
         Stack = new ushort[12];
         Memory = new byte[4096];
-        Screen = new byte[64 * 32];
+        Screen = new bool[64 * 32];
         V = new byte[16];
         Keys = new bool[16];
 
@@ -129,7 +129,7 @@ internal class State
     {
         for (int i = 0; i < Screen.Length; i++)
         {
-            Screen[i] = 0;
+            Screen[i] = false;
         }
     }
 
@@ -392,13 +392,13 @@ internal class State
                     var x = (V[X] + column) % 64;
 
                     // Collision detection: If the target pixel is already set then set the collision detection flag in register VF.
-                    if (Screen[y * 64 + x] == 1)
+                    if (Screen[y * 64 + x])
                     {
                         V[0xF] = 1;
                     }
 
                     // Enable or disable the pixel (XOR operation).
-                    Screen[y * 64 + x] ^= 1;
+                    Screen[y * 64 + x] = !Screen[y * 64 + x];
                 }
 
                 // Shift the next bit in from the right.

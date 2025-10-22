@@ -22,7 +22,7 @@ internal static class TestMethods
         Assert.AreEqual(expected, state.Variables[register]);
     }
 
-    public static void TestScreen(byte[] rom, uint cycles, byte[] expected)
+    public static void TestScreen(byte[] rom, uint cycles, bool[] expected)
     {
         var vm = new VirtualMachine(null, rom);
         vm.Cycle(cycles);
@@ -30,7 +30,7 @@ internal static class TestMethods
         CollectionAssert.AreEqual(expected, state.Screen.ToArray());
     }
 
-    public static void TestScreen(string rom, uint cycles, byte[] expected)
+    public static void TestScreen(string rom, uint cycles, bool[] expected)
     {
         var vm = new VirtualMachine(null, rom);
         vm.Cycle(cycles);

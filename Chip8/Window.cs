@@ -14,7 +14,7 @@ public class Window : GameWindow, IChip8Window
     private const uint PixelCount = 64 * 32; // 64x32 pixels
     private byte[] _pixels = new byte[PixelCount]; // 0x00 = off, 0xFF = on
     private bool _isRunning;
-    private byte _isBeeping;
+    private bool _isBeeping;
     private bool _disposedValue = false;
 
     private WindowGraphics? _graphics;
@@ -52,30 +52,30 @@ public class Window : GameWindow, IChip8Window
         SwapBuffers();
     }
 
-    public void UpdateScreen(IList<byte> screen)
+    public void UpdateScreen(IList<bool> screen)
     {
         for (int i = 0; i < PixelCount; i++)
         {
-            _pixels[i] = (byte)((screen[i] != 0 ? 0xFF : 0x00) ^ _isBeeping);
+            _pixels[i] = (byte)((screen[i] ^ _isBeeping) ? 0xFF : 0x00);
         }
     }
 
     public void Beep()
     {
-        if (_isBeeping == 0xFF)
+        if (_isBeeping)
             return;
 
         void InvertPixels() => _pixels = _pixels
             .Select(static p => (byte)(p ^ 0xFF))
             .ToArray();
 
-        _isBeeping = 0xFF;
+        _isBeeping = true;
         InvertPixels();
 
         var timer = new System.Timers.Timer(100);
         timer.Elapsed += (object? _, ElapsedEventArgs _) =>
         {
-            _isBeeping = 0x00;
+            _isBeeping = false;
             InvertPixels();
         };
         timer.AutoReset = false;

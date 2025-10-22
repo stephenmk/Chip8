@@ -75,31 +75,18 @@ public class Debugger
         var state = _virtualMachine.Snapshot();
         var output = new StringBuilder();
 
-        for (int i = 0; i < state.Screen.Length; i += 64)
-        {
-            output.Append($"0x{i:X3}:");
-            output.Append($" 0x{state.Screen[i]:X2}");
-            output.Append($" 0x{state.Screen[i + 1]:X2}");
-            output.Append($" 0x{state.Screen[i + 2]:X2}");
-            output.Append($" 0x{state.Screen[i + 3]:X2}");
-            output.Append($" 0x{state.Screen[i + 4]:X2}");
-            output.Append($" 0x{state.Screen[i + 5]:X2}");
-            output.Append($" 0x{state.Screen[i + 6]:X2}");
-            output.Append($" 0x{state.Screen[i + 7]:X2}");
-            output.AppendLine();
-        }
-
-        output.AppendLine(" ----------------------------------------------------------------");
+        output.AppendLine("┌────────────────────────────────────────────────────────────────┐");
         for (int i = 0; i < 32; i++)
         {
-            output.Append('|');
+            output.Append('│');
             for (int j = 0; j < 64; j++)
             {
-                output.Append(state.Screen[i * 64 + j] > 0 ? "█" : " ");
+                output.Append(state.Screen[i * 64 + j] ? "█" : " ");
             }
-            output.AppendLine("|");
+            output.Append('│');
+            output.AppendLine();
         }
-        output.AppendLine(" ----------------------------------------------------------------");
+        output.AppendLine("└────────────────────────────────────────────────────────────────┘");
 
         Console.WriteLine(output);
     }

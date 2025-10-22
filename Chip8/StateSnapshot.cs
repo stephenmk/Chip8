@@ -20,6 +20,6 @@ public readonly ref struct StateSnapshot
     public ReadOnlySpan<ushort> Stack { get; init; }
     public ReadOnlySpan<byte> Variables { get; init; }
     public ReadOnlySpan<byte> Memory { get; init; }
-    public ReadOnlySpan<byte> Screen { get; init; }
+    public ReadOnlySpan<bool> Screen { get; init; }
     public ReadOnlySpan<bool> Keys { get; init; }
 }

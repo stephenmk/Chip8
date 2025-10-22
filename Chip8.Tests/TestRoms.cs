@@ -9,8 +9,10 @@ namespace Chip8.Tests;
 [TestClass]
 public class TestRoms
 {
-    private static byte[] GetScreen(string filename) =>
-        File.ReadAllBytes(Path.Join("Screens", filename));
+    private static bool[] GetScreen(string filename) =>
+        File.ReadAllBytes(Path.Join("Screens", filename))
+            .Select(static b => b == 0x01)
+            .ToArray();
 
     [TestMethod]
     public void Test_RunC8TestRom_ShouldReturnOKScreen()
