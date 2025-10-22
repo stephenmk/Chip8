@@ -244,28 +244,37 @@ internal class State
     /// <summary>
     /// Sets Vx to Vx or Vy (bitwise OR operation).
     /// </summary>
-    public void OpCode8XY1(byte x, byte y)
+    public void OpCode8XY1(byte x, byte y, bool quirk = true)
     {
         V[x] = (byte)(V[x] | V[y]);
-        V[0xF] = 0x00; // Chip8 Quirk.
+        if (quirk)
+        {
+            V[0xF] = 0x00;
+        }
     }
 
     /// <summary>
     /// Sets Vx to Vx and Vy (bitwise AND operation).
     /// </summary>
-    public void OpCode8XY2(byte x, byte y)
+    public void OpCode8XY2(byte x, byte y, bool quirk = true)
     {
         V[x] = (byte)(V[x] & V[y]);
-        V[0xF] = 0x00; // Chip8 Quirk.
+        if (quirk)
+        {
+            V[0xF] = 0x00;
+        }
     }
 
     /// <summary>
     /// Sets Vx to Vx xor Vy.
     /// </summary>
-    public void OpCode8XY3(byte x, byte y)
+    public void OpCode8XY3(byte x, byte y, bool quirk = true)
     {
         V[x] = (byte)(V[x] ^ V[y]);
-        V[0xF] = 0x00; // Chip8 Quirk.
+        if (quirk)
+        {
+            V[0xF] = 0x00;
+        }
     }
 
     /// <summary>
@@ -533,13 +542,16 @@ internal class State
     /// The offset from I is increased by 1 for each value written, but I itself is left unmodified.
     /// Due to a quirk, I is left pointing to the address following the last one read into a variable.
     /// </remarks>
-    public void OpCodeFX55(byte x)
+    public void OpCodeFX55(byte x, bool quirk = true)
     {
         for (int i = 0; i <= x; i++)
         {
             Memory[I + i] = V[i];
         }
-        I += (ushort)(x + 1); // Chip8 Quirk.
+        if (quirk)
+        {
+            I += (ushort)(x + 1);
+        }
     }
 
     /// <summary>
@@ -549,12 +561,15 @@ internal class State
     /// The offset from I is increased by 1 for each value read, but I itself is left unmodified.
     /// Due to a quirk, I is left pointing to the address following the last one read into a variable.
     /// </remarks>
-    public void OpCodeFX65(byte x)
+    public void OpCodeFX65(byte x, bool quirk = true)
     {
         for (int i = 0; i <= x; i++)
         {
             V[i] = Memory[I + i];
         }
-        I += (ushort)(x + 1); // Chip8 Quirk.
+        if (quirk)
+        {
+            I += (ushort)(x + 1);
+        }
     }
 }
