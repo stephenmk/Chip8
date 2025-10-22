@@ -316,10 +316,15 @@ internal class State
     /// Shifts VX to the left by 1, then sets VF to 1 if the most significant
     /// bit of VX prior to that shift was set, or to 0 if it was unset.
     /// </summary>
+    /// <remarks>
+    /// Note that x is allowed to be F, and the assignment to VF must
+    /// be done after the assignment to Vx.
+    /// </remarks>
     public void OpCode8XYE(byte x, byte _)
     {
-        V[0xF] = (byte)((V[x] & 0x80) >> 7);
-        V[x] <<= 0x1;
+        bool isMostSigBitSet = (V[x] & 0b1000_0000) == 0b1000_0000;
+        V[x] <<= 0x01;
+        V[0xF] = (byte)(isMostSigBitSet ? 0x01 : 0x00);
     }
 
     /// <summary>
