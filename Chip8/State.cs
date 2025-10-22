@@ -309,7 +309,7 @@ internal class State
     {
         int diff = V[y] - V[x];
         V[x] = (byte)diff;
-        V[0xF] = (byte)(diff < 0 ? 0 : 1);
+        V[0xF] = (byte)(diff < 0 ? 0x00 : 0x01);
     }
 
     /// <summary>
