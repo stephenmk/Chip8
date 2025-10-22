@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
@@ -13,12 +14,12 @@
     <ProjectReference Include="..\Chip8\Chip8.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="$(SolutionDir)\Roms\*test*.ch8">
+    <None Include="Screens\*.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Screens\*screen.dat">
+    <None Include="Timendus-chip8-test-suite\*.ch8">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

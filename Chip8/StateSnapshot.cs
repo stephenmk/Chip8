@@ -17,7 +17,8 @@ public readonly ref struct StateSnapshot
     public bool Blocked { get; init; }
     public byte DelayTimer { get; init; }
     public byte SoundTimer { get; init; }
-    public UInt128 CycleCount { get; init; }
+    public ushort CycleCount { get; init; }
+    public UInt128 InstructionCycles { get; init; }
     public ReadOnlySpan<ushort> Stack { get; init; }
     public ReadOnlySpan<byte> Variables { get; init; }
     public ReadOnlySpan<byte> Memory { get; init; }

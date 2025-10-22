@@ -30,11 +30,18 @@ internal static class TestMethods
         CollectionAssert.AreEqual(expected, state.Screen.ToArray());
     }
 
-    public static void TestScreen(string rom, uint cycles, bool[] expected)
+    public static void TestScreen(string romFilename, uint cycles, string screenFilename)
     {
-        var vm = new VirtualMachine(null, rom);
+        var romPath = Path.Join("Timendus-chip8-test-suite", romFilename);
+        var vm = new VirtualMachine(null, romPath);
         vm.Cycle(cycles);
         var state = vm.Snapshot();
+
+        var expected = File.ReadAllText(Path.Join("Screens", screenFilename))
+            .Where(static c => c != '\n')
+            .Select(static c => c != '█')
+            .ToArray();
+
         CollectionAssert.AreEqual(expected, state.Screen.ToArray());
     }
 }
