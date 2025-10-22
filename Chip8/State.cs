@@ -308,8 +308,8 @@ internal class State
     public void OpCode8XY7(byte x, byte y)
     {
         int diff = V[y] - V[x];
-        V[x] = (byte)(diff & 0xFF);
-        V[0xF] = (byte)(diff > 0 ? 1 : 0);
+        V[x] = (byte)diff;
+        V[0xF] = (byte)(diff < 0 ? 0 : 1);
     }
 
     /// <summary>
