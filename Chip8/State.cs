@@ -354,7 +354,7 @@ internal class State
     /// </summary>
     public void OpCodeBNNN(ushort nnn)
     {
-        PC = (ushort)(nnn + V[0]);
+        PC = (ushort)(nnn + V[0x0]);
     }
 
     /// <summary>
@@ -364,7 +364,7 @@ internal class State
     public void OpCodeCXNN(byte x, byte nn)
     {
         var random = new Random();
-        V[x] = (byte)(random.Next(0, 0xFF) & nn);
+        V[x] = (byte)(random.Next(0x00, 0xFF) & nn);
     }
 
     /// <summary>
@@ -395,15 +395,16 @@ internal class State
                 {
                     // Get the current x position and wrap around if needed.
                     var x = (V[X] + column) % 64;
+                    var idx = y * 64 + x;
 
                     // Collision detection: If the target pixel is already set then set the collision detection flag in register VF.
-                    if (Screen[y * 64 + x])
+                    if (Screen[idx])
                     {
                         V[0xF] = 1;
                     }
 
                     // Enable or disable the pixel (XOR operation).
-                    Screen[y * 64 + x] = !Screen[y * 64 + x];
+                    Screen[idx] = !Screen[idx];
                 }
 
                 // Shift the next bit in from the right.
