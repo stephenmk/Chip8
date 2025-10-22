@@ -290,10 +290,15 @@ internal class State
     /// Shifts Vx to the right by 1, then stores the least significant
     /// bit of Vx prior to the shift into VF.
     /// </summary>
+    /// <remarks>
+    /// Note that x is allowed to be F, and the assignment to VF must
+    /// be done after the assignment to Vx.
+    /// </remarks>
     public void OpCode8XY6(byte x, byte _)
     {
-        V[0xF] = (byte)(V[x] & 0x1);
-        V[x] >>= 0x1;
+        byte leastSignificant = (byte)(V[x] & 0x01);
+        V[x] >>= 0x01;
+        V[0xF] = leastSignificant;
     }
 
     /// <summary>
