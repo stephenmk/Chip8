@@ -177,7 +177,11 @@ public class VirtualMachine
 
         if (_state.UpdateTimers())
         {
-            _window?.Beep();
+            _window?.StartBeep();
+        }
+        else
+        {
+            _window?.EndBeep();
         }
     }
 

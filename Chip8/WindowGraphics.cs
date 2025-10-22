@@ -63,11 +63,16 @@ public class WindowGraphics : IDisposable
         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
     }
 
-    public void Render(byte[] pixels)
+    public void Render(bool[] pixels)
     {
         GL.Clear(ClearBufferMask.ColorBufferBit);
         _shader?.Use();
-        GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, 64, 32, PixelFormat.Red, PixelType.UnsignedByte, pixels);
+
+        var byteArray = pixels
+            .Select(static pixel => (byte)(pixel ? 0xFF : 0x00))
+            .ToArray();
+
+        GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, 64, 32, PixelFormat.Red, PixelType.UnsignedByte, byteArray);
 
         // 6: length of `uint[] indices`
         // 0: pointer to location of the `indices` array.

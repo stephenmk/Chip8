@@ -2,7 +2,6 @@
 // Copyright (c) 2025 Stephen Kraus
 // SPDX-License-Identifier: MIT
 
-using System.Timers;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -11,8 +10,8 @@ namespace Chip8;
 
 public class Window : GameWindow, IChip8Window
 {
-    private const uint PixelCount = 64 * 32; // 64x32 pixels
-    private byte[] _pixels = new byte[PixelCount]; // 0x00 = off, 0xFF = on
+    private const uint PixelCount = 64 * 32;
+    private readonly bool[] _pixels = new bool[PixelCount];
     private bool _isRunning;
     private bool _isBeeping;
     private bool _disposedValue = false;
@@ -56,30 +55,26 @@ public class Window : GameWindow, IChip8Window
     {
         for (int i = 0; i < PixelCount; i++)
         {
-            _pixels[i] = (byte)((screen[i] ^ _isBeeping) ? 0xFF : 0x00);
+            _pixels[i] = screen[i] ^ _isBeeping;
         }
     }
 
-    public void Beep()
+    public void StartBeep()
+    {
+        if (!_isBeeping)
+        {
+            _isBeeping = true;
+            UpdateScreen(_pixels);
+        }
+    }
+
+    public void EndBeep()
     {
         if (_isBeeping)
-            return;
-
-        void InvertPixels() => _pixels = _pixels
-            .Select(static p => (byte)(p ^ 0xFF))
-            .ToArray();
-
-        _isBeeping = true;
-        InvertPixels();
-
-        var timer = new System.Timers.Timer(100);
-        timer.Elapsed += (object? _, ElapsedEventArgs _) =>
         {
             _isBeeping = false;
-            InvertPixels();
-        };
-        timer.AutoReset = false;
-        timer.Enabled = true;
+            UpdateScreen(_pixels);
+        }
     }
 
     protected override void OnFileDrop(FileDropEventArgs obj)

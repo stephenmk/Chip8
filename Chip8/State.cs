@@ -14,6 +14,7 @@ internal class State
     private ushort PC;  // Program Counter
     private ushort SP;  // Stack Pointer
 
+    private bool Beep;
     private bool Blocked;
     private byte DelayTimer;
     private byte SoundTimer;
@@ -113,13 +114,13 @@ internal class State
             {
                 DelayTimer--;
             }
-            if (SoundTimer > 0)
+            Beep = SoundTimer > 0;
+            if (Beep)
             {
                 SoundTimer--;
-                return true;
             }
         }
-        return false;
+        return Beep;
     }
 
     /// <summary>
