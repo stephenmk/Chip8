@@ -296,9 +296,9 @@ internal class State
     /// </remarks>
     public void OpCode8XY6(byte x, byte _)
     {
-        byte leastSignificant = (byte)(V[x] & 0x01);
+        byte leastSigBit = (byte)(V[x] & 0b0000_0001);
         V[x] >>= 0x01;
-        V[0xF] = leastSignificant;
+        V[0xF] = leastSigBit;
     }
 
     /// <summary>
