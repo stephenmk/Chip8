@@ -42,7 +42,8 @@ public class Window : GameWindow, IChip8Window
         base.OnUpdateFrame(e);
         if (_isRunning)
         {
-            _virtualMachine?.Cycle(1);
+            // VM runs at 600Hz; window updates at 300Hz.
+            _virtualMachine?.Cycle(2);
         }
     }
 

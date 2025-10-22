@@ -103,13 +103,13 @@ internal class State
     }
 
     /// <remarks>
-    /// The update frequency is 480 Hz. Timers should be
-    /// updated at 60 Hz, so update timers every 8th cycle.
+    /// The update frequency is 600 Hz. Timers should be
+    /// updated at 60 Hz, so update timers every 10th cycle.
     /// </remarks>
     /// <returns><c>true</c> if beeping, otherwise <c>false</c>.</returns>
     public bool UpdateTimers()
     {
-        if ((++CycleCount % 8) == 0)
+        if ((++CycleCount % 10) == 0)
         {
             if (DelayTimer > 0)
             {

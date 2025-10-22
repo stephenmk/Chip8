@@ -39,7 +39,7 @@ class Program
         var gameSettings = new GameWindowSettings
         {
             // Values higher than 500.0Hz are clamped to 500.0Hz.
-            UpdateFrequency = 480
+            UpdateFrequency = 300
         };
 
         var nativeSettings = new NativeWindowSettings
