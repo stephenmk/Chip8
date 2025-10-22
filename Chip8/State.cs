@@ -297,8 +297,12 @@ internal class State
     /// Note that x is allowed to be F, and the assignment to VF must
     /// be done after the assignment to Vx.
     /// </remarks>
-    public void OpCode8XY6(byte x, byte _)
+    public void OpCode8XY6(byte x, byte y, bool quirk = false)
     {
+        if (!quirk)
+        {
+            V[x] = V[y];
+        }
         byte leastSigBit = (byte)(V[x] & 0b0000_0001);
         V[x] >>= 0x01;
         V[0xF] = leastSigBit;
@@ -323,8 +327,12 @@ internal class State
     /// Note that x is allowed to be F, and the assignment to VF must
     /// be done after the assignment to Vx.
     /// </remarks>
-    public void OpCode8XYE(byte x, byte _)
+    public void OpCode8XYE(byte x, byte y, bool quirk = false)
     {
+        if (!quirk)
+        {
+            V[x] = V[y];
+        }
         bool isMostSigBitSet = (V[x] & 0b1000_0000) == 0b1000_0000;
         V[x] <<= 0x01;
         V[0xF] = (byte)(isMostSigBitSet ? 0x01 : 0x00);
