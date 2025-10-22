@@ -246,6 +246,7 @@ internal class State
     public void OpCode8XY1(byte x, byte y)
     {
         V[x] = (byte)(V[x] | V[y]);
+        V[0xF] = 0x00; // Quirk.
     }
 
     /// <summary>
@@ -254,6 +255,7 @@ internal class State
     public void OpCode8XY2(byte x, byte y)
     {
         V[x] = (byte)(V[x] & V[y]);
+        V[0xF] = 0x00; // Quirk.
     }
 
     /// <summary>
@@ -262,6 +264,7 @@ internal class State
     public void OpCode8XY3(byte x, byte y)
     {
         V[x] = (byte)(V[x] ^ V[y]);
+        V[0xF] = 0x00; // Quirk.
     }
 
     /// <summary>
