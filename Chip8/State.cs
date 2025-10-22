@@ -57,6 +57,7 @@ internal class State
         MemoryAddress = I,
         ProgramCounter = PC,
         StackPointer = SP,
+        Beep = Beep,
         Blocked = Blocked,
         DelayTimer = DelayTimer,
         SoundTimer = SoundTimer,
