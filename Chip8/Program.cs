@@ -44,8 +44,8 @@ class Program
 
         var nativeSettings = new NativeWindowSettings
         {
-            ClientSize = new Vector2i(1024, 512),
-            Profile = ContextProfile.Compatability,
+            ClientSize = new Vector2i(1024, 640),
+            Profile = ContextProfile.Core,
             Title = "Chip8 Emulator"
         };
 

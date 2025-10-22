@@ -21,5 +21,5 @@ public readonly ref struct StateSnapshot
     public ReadOnlySpan<byte> Variables { get; init; }
     public ReadOnlySpan<byte> Memory { get; init; }
     public ReadOnlySpan<byte> Screen { get; init; }
-    public ReadOnlySpan<byte> Keys { get; init; }
+    public ReadOnlySpan<bool> Keys { get; init; }
 }

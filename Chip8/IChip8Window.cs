@@ -10,4 +10,5 @@ namespace Chip8;
 public interface IChip8Window
 {
     void Beep();
+    void UpdateScreen(IList<byte> screen);
 }

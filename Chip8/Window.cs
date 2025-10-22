@@ -2,10 +2,7 @@
 // Copyright (c) 2025 Stephen Kraus
 // SPDX-License-Identifier: MIT
 
-using System.ComponentModel;
-using System.Drawing;
 using System.Timers;
-using OpenTK.Graphics.OpenGL;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -14,8 +11,13 @@ namespace Chip8;
 
 public class Window : GameWindow, IChip8Window
 {
+    private const uint PixelCount = 64 * 32; // 64x32 pixels
+    private byte[] _pixels = new byte[PixelCount]; // 0x00 = off, 0xFF = on
     private bool _isRunning;
-    private byte _isInverted;
+    private byte _isBeeping;
+    private bool _disposedValue = false;
+
+    private WindowGraphics? _graphics;
     private VirtualMachine? _virtualMachine;
     private Debugger? _debugger;
 
@@ -32,11 +34,7 @@ public class Window : GameWindow, IChip8Window
     protected override void OnLoad()
     {
         base.OnLoad();
-        GL.ClearColor(Color.Black);
-        GL.Color3(Color.White);
-        GL.Ortho(0, 64, 32, 0, -1, 1);
-        GL.Clear(ClearBufferMask.ColorBufferBit);
-        SwapBuffers();
+        _graphics = new WindowGraphics(PixelCount);
     }
 
     protected override void OnUpdateFrame(FrameEventArgs e)
@@ -50,40 +48,38 @@ public class Window : GameWindow, IChip8Window
 
     protected override void OnRenderFrame(FrameEventArgs e)
     {
-        GL.Clear(ClearBufferMask.ColorBufferBit);
-        if (_virtualMachine is not null)
-        {
-            var state = _virtualMachine.Snapshot();
-            var buffer = state.Screen;
-            for (int y = 0; y < 32; y++)
-            {
-                for (int x = 0; x < 64; x++)
-                {
-                    if (buffer[y * 64 + x] != _isInverted)
-                    {
-                        GL.Rect(x, y, x + 1, y + 1);
-                    }
-                }
-            }
-        }
+        _graphics?.Render(_pixels);
         SwapBuffers();
+    }
+
+    public void UpdateScreen(IList<byte> screen)
+    {
+        for (int i = 0; i < PixelCount; i++)
+        {
+            _pixels[i] = (byte)((screen[i] != 0 ? 0xFF : 0x00) ^ _isBeeping);
+        }
     }
 
     public void Beep()
     {
-        if (_isInverted == 0)
-        {
-            _isInverted = 1;
-            var timer = new System.Timers.Timer(500);
-            timer.Elapsed += EndInversion;
-            timer.AutoReset = false;
-            timer.Enabled = true;
-        }
-    }
+        if (_isBeeping == 0xFF)
+            return;
 
-    private void EndInversion(object? source, ElapsedEventArgs e)
-    {
-        _isInverted = 0;
+        void InvertPixels() => _pixels = _pixels
+            .Select(static p => (byte)(p == 0x00 ? 0xFF : 0x00))
+            .ToArray();
+
+        _isBeeping = 0xFF;
+        InvertPixels();
+
+        var timer = new System.Timers.Timer(100);
+        timer.Elapsed += (object? _, ElapsedEventArgs _) =>
+        {
+            _isBeeping = 0x00;
+            InvertPixels();
+        };
+        timer.AutoReset = false;
+        timer.Enabled = true;
     }
 
     protected override void OnFileDrop(FileDropEventArgs obj)
@@ -143,13 +139,16 @@ public class Window : GameWindow, IChip8Window
     protected override void OnResize(ResizeEventArgs e)
     {
         base.OnResize(e);
-        GL.Viewport(0, 0, e.Width, e.Height);
+        _graphics?.Resize(0, 0, Size.X, Size.Y);
     }
 
-    protected override void OnClosing(CancelEventArgs e)
+    protected override void Dispose(bool _)
     {
-        base.OnClosing(e);
-        Environment.Exit(0);
+        if (!_disposedValue)
+        {
+            _graphics?.Dispose();
+            _disposedValue = true;
+        }
     }
 
     private static byte? KeyToByte(Keys key) => key switch

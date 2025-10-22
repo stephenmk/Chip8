@@ -136,6 +136,7 @@ public class VirtualMachine
                 break;
             case 0xD000:
                 _state.OpCodeDXYN(x, y, n);
+                UpdateScreen();
                 break;
             case 0xE000 when (opCode & 0x00FF) == 0x9E:
                 _state.OpCodeEX9E(x);
@@ -178,5 +179,12 @@ public class VirtualMachine
         {
             _window?.Beep();
         }
+    }
+
+    private void UpdateScreen()
+    {
+        var snapshot = Snapshot();
+        var screen = snapshot.Screen.ToImmutableArray();
+        _window?.UpdateScreen(screen);
     }
 }

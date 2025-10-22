@@ -64,6 +64,7 @@ internal class State
         Variables = V.AsSpan(),
         Memory = Memory.AsSpan(),
         Screen = Screen.AsSpan(),
+        Keys = Keys.AsSpan(),
     };
 
     public void SetKey(byte key)
