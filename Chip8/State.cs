@@ -18,7 +18,8 @@ internal class State
     private bool Blocked;
     private byte DelayTimer;
     private byte SoundTimer;
-    private UInt128 CycleCount;
+    private ushort CycleCount;
+    private UInt128 InstructionCycles;
 
     private readonly byte[] V;  // Variables (16 available, 0 to F)
     private readonly byte[] Memory;
@@ -37,6 +38,7 @@ internal class State
         DelayTimer = 0;
         SoundTimer = 0;
         CycleCount = 0;
+        InstructionCycles = 0;
 
         Stack = new ushort[12];
         Memory = new byte[4096];
@@ -61,7 +63,7 @@ internal class State
         Blocked = Blocked,
         DelayTimer = DelayTimer,
         SoundTimer = SoundTimer,
-        CycleCount = CycleCount,
+        CycleCount = InstructionCycles,
         Stack = Stack.AsSpan(),
         Variables = V.AsSpan(),
         Memory = Memory.AsSpan(),
@@ -89,6 +91,7 @@ internal class State
         DelayTimer = 0;
         SoundTimer = 0;
         CycleCount = 0;
+        InstructionCycles = 0;
         OpCode00E0();  // Clear screen
     }
 
@@ -109,8 +112,10 @@ internal class State
     /// <returns><c>true</c> if beeping, otherwise <c>false</c>.</returns>
     public bool UpdateTimers()
     {
+        InstructionCycles++;
         if ((++CycleCount % 10) == 0)
         {
+            CycleCount = 0;
             if (DelayTimer > 0)
             {
                 DelayTimer--;
