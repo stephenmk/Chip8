@@ -270,9 +270,9 @@ internal class State
     /// </summary>
     public void OpCode8XY4(byte x, byte y)
     {
-        bool overflow = V[x] + V[y] > 255;
-        V[x] += V[y];
-        V[0xF] = (byte)(overflow ? 0x01 : 0x00);
+        int newValue = V[x] + V[y];
+        V[x] = (byte)newValue;
+        V[0xF] = (byte)(newValue > 255 ? 0x01 : 0x00);
     }
 
     /// <summary>
@@ -281,9 +281,9 @@ internal class State
     /// </summary>
     public void OpCode8XY5(byte x, byte y)
     {
-        bool underflow = V[x] - V[y] < 0;
-        V[x] -= V[y];
-        V[0xF] = (byte)(underflow ? 0x00 : 0x01);
+        int newValue = V[x] - V[y];
+        V[x] = (byte)newValue;
+        V[0xF] = (byte)(newValue < 0 ? 0x00 : 0x01);
     }
 
     /// <summary>
