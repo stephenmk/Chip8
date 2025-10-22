@@ -220,7 +220,7 @@ internal class State
     /// <summary>
     /// Sets Vx to NN.
     /// </summary>
-    public void OpCode6XNN(ushort x, ushort nn)
+    public void OpCode6XNN(byte x, ushort nn)
     {
         V[x] = (byte)nn;
     }
