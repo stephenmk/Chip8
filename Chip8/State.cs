@@ -270,9 +270,9 @@ internal class State
     /// </summary>
     public void OpCode8XY4(byte x, byte y)
     {
-        int newValue = V[x] + V[y];
-        V[x] = (byte)newValue;
-        V[0xF] = (byte)(newValue > 255 ? 0x01 : 0x00);
+        int sum = V[x] + V[y];
+        V[x] = (byte)sum;
+        V[0xF] = (byte)(sum > 255 ? 0x01 : 0x00);
     }
 
     /// <summary>
@@ -281,9 +281,9 @@ internal class State
     /// </summary>
     public void OpCode8XY5(byte x, byte y)
     {
-        int newValue = V[x] - V[y];
-        V[x] = (byte)newValue;
-        V[0xF] = (byte)(newValue < 0 ? 0x00 : 0x01);
+        int diff = V[x] - V[y];
+        V[x] = (byte)diff;
+        V[0xF] = (byte)(diff < 0 ? 0x00 : 0x01);
     }
 
     /// <summary>
