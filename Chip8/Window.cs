@@ -66,7 +66,7 @@ public class Window : GameWindow, IChip8Window
             return;
 
         void InvertPixels() => _pixels = _pixels
-            .Select(static p => (byte)(p == 0x00 ? 0xFF : 0x00))
+            .Select(static p => (byte)(p ^ 0xFF))
             .ToArray();
 
         _isBeeping = 0xFF;
