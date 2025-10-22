@@ -68,34 +68,15 @@ public class TestTimendusRom1
     [TestMethod]
     public void Test_1_chip8_logo_cycle39()
     {
-        FinalLogo(39);
-    }
-
-    [TestMethod]
-    public void Test_1_chip8_logo_cycle60()
-    {
-        FinalLogo(60);
-    }
-
-    [TestMethod]
-    public void Test_1_chip8_logo_cycle99()
-    {
-        FinalLogo(99);
-    }
-
-    [TestMethod]
-    public void Test_1_chip8_logo_cycle10k()
-    {
-        FinalLogo(10_000);
-    }
-
-    private static void FinalLogo(uint cycles)
-    {
-        TestScreen
-        (
-            romFilename: RomFilename,
-            cycles: cycles,
-            screenFilename: "1-chip8-logo-cycle39.txt"
-        );
+        uint[] cyclesList = [39, 60, 99, 10_000];
+        foreach (var cycles in cyclesList)
+        {
+            TestScreen
+            (
+                romFilename: RomFilename,
+                cycles: cycles,
+                screenFilename: "1-chip8-logo-cycle39.txt"
+            );
+        }
     }
 }
