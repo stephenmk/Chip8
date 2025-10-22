@@ -49,7 +49,7 @@ public class Window : GameWindow, IChip8Window
 
     protected override void OnRenderFrame(FrameEventArgs e)
     {
-        if (_isRunning)
+        if (_virtualMachine is not null)
         {
             _graphics?.Render(_pixels);
         }
