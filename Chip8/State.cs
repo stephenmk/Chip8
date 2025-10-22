@@ -246,7 +246,7 @@ internal class State
     public void OpCode8XY1(byte x, byte y)
     {
         V[x] = (byte)(V[x] | V[y]);
-        V[0xF] = 0x00; // Quirk.
+        V[0xF] = 0x00; // Chip8 Quirk.
     }
 
     /// <summary>
@@ -255,7 +255,7 @@ internal class State
     public void OpCode8XY2(byte x, byte y)
     {
         V[x] = (byte)(V[x] & V[y]);
-        V[0xF] = 0x00; // Quirk.
+        V[0xF] = 0x00; // Chip8 Quirk.
     }
 
     /// <summary>
@@ -264,7 +264,7 @@ internal class State
     public void OpCode8XY3(byte x, byte y)
     {
         V[x] = (byte)(V[x] ^ V[y]);
-        V[0xF] = 0x00; // Quirk.
+        V[0xF] = 0x00; // Chip8 Quirk.
     }
 
     /// <summary>
@@ -522,6 +522,7 @@ internal class State
     /// </summary>
     /// <remarks>
     /// The offset from I is increased by 1 for each value written, but I itself is left unmodified.
+    /// Due to a quirk, I is left pointing to the address following the last one read into a variable.
     /// </remarks>
     public void OpCodeFX55(byte x)
     {
@@ -529,6 +530,7 @@ internal class State
         {
             Memory[I + i] = V[i];
         }
+        I += (ushort)(x + 1); // Chip8 Quirk.
     }
 
     /// <summary>
@@ -536,6 +538,7 @@ internal class State
     /// </summary>
     /// <remarks>
     /// The offset from I is increased by 1 for each value read, but I itself is left unmodified.
+    /// Due to a quirk, I is left pointing to the address following the last one read into a variable.
     /// </remarks>
     public void OpCodeFX65(byte x)
     {
@@ -543,5 +546,6 @@ internal class State
         {
             V[i] = Memory[I + i];
         }
+        I += (ushort)(x + 1); // Chip8 Quirk.
     }
 }
