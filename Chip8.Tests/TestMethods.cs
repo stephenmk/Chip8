@@ -6,6 +6,15 @@ namespace Chip8.Tests;
 
 internal static class TestMethods
 {
+    public static byte[] TimendusRomBytes(string filename) =>
+        File.ReadAllBytes(Path.Join("Timendus-chip8-test-suite", filename));
+
+    public static bool[] ExpectedScreen(string filename) =>
+        File.ReadAllText(Path.Join("Screens", filename))
+            .Where(static c => c != '\n')
+            .Select(static c => c != '█')
+            .ToArray();
+
     public static void TestPC(byte[] rom, uint cycles, ushort expected)
     {
         var vm = new VirtualMachine(null, rom);
@@ -32,16 +41,11 @@ internal static class TestMethods
 
     public static void TestScreen(string romFilename, uint cycles, string screenFilename)
     {
-        var romBytes = File.ReadAllBytes(Path.Join("Timendus-chip8-test-suite", romFilename));
+        var romBytes = TimendusRomBytes(romFilename);
         var vm = new VirtualMachine(null, romBytes);
         vm.Cycle(cycles);
         var state = vm.Snapshot();
-
-        var expected = File.ReadAllText(Path.Join("Screens", screenFilename))
-            .Where(static c => c != '\n')
-            .Select(static c => c != '█')
-            .ToArray();
-
+        var expected = ExpectedScreen(screenFilename);
         CollectionAssert.AreEqual(expected, state.Screen.ToArray());
     }
 }

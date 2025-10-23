@@ -10,7 +10,7 @@ internal class State
     private const ushort RomStart = 0x200;
     private readonly int InstructionsPerTimerCycle;
 
-    private ushort OpCode;
+    private ushort OpCode; // 16bit instruction
     private ushort I;  // 12bit register (for memory address)
     private ushort PC;  // 12bit Program Counter
     private byte SP;  // 8bit Stack Pointer
