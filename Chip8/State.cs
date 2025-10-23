@@ -88,6 +88,7 @@ internal class State
         I = 0x000;
         PC = RomStart;
         SP = 0x0;
+        Beep = false;
         Blocked = false;
         DelayTimer = 0;
         SoundTimer = 0;
@@ -400,49 +401,80 @@ internal class State
     }
 
     /// <summary>
-    /// Draws a sprite at coordinate (Vx, Vy) that has a width of 8 pixels and a height of N pixels.
+    /// Draws a sprite at coordinate (Vx, Vy) that has a width of 8 pixels and a height of `n` (at most 15) pixels.
     /// </summary>
     /// <remarks>
-    /// Source: https://stackoverflow.com/questions/17346592/how-does-chip-8-graphics-rendered-on-screen
+    /// https://www.laurencescotford.net/2020/07/19/chip-8-on-the-cosmac-vip-drawing-sprites/
     /// </remarks>
     public void OpCodeDXYN(byte x, byte y, byte n, bool _, bool clippingQuirk)
     {
         // Initialize the collision detection as no collision detected (yet).
-        V[0xF] = 0;
+        V[0xF] = 0x00;
 
-        // Draw N lines on the screen.
-        for (int line = 0; line < N; line++)
+        // Draw `n` lines on the screen (at most 0xF, i.e. 15)
+        for (int line = 0; line < n; line++)
         {
-            // y is the starting line Y + current line. If y is larger than the total width of the screen then wrap around (this is the modulo operation).
-            var y = (V[Y] + line) % 32;
+            // screenY is the starting line `Vy` + current line. If larger than the total
+            // width of the screen then wrap around (this is the modulo operation).
+            int startingY = clippingQuirk ? V[y] % 32 : V[y];
 
-            // The current sprite being drawn, each line is a new sprite.
-            byte sprite = Memory[I + line];
+            if (clippingQuirk && (startingY + line >= 32))
+                continue;
+
+            int screenY = (startingY + line) % 32;
+
+            // The current part of the sprite being drawn. Each line has a new part.
+            byte spritePart = Memory[I + line];
 
             // Each bit in the sprite is a pixel on or off.
+            var pixelIsOn = ParseSpritePart(spritePart);
+
             for (int column = 0; column < 8; column++)
             {
-                // Start with the current most significant bit. The next bit will be left shifted in from the right.
-                if ((sprite & 0b1000_0000) != 0)
+                if (!pixelIsOn[column])
+                    continue;
+
+                // Get the current x position and wrap around if needed.
+                int startingX = clippingQuirk ? V[x] % 64 : V[x];
+
+                if (clippingQuirk && (startingX + column >= 64))
+                    continue;
+
+                var screenX = (startingX + column) % 64;
+
+                var pixelIndex = screenY * 64 + screenX;
+
+                // Collision detection: If the target pixel is already set,
+                // then set the collision detection flag in register VF.
+                if (Screen[pixelIndex])
                 {
-                    // Get the current x position and wrap around if needed.
-                    var x = (V[X] + column) % 64;
-                    var idx = y * 64 + x;
-
-                    // Collision detection: If the target pixel is already set then set the collision detection flag in register VF.
-                    if (Screen[idx])
-                    {
-                        V[0xF] = 1;
-                    }
-
-                    // Enable or disable the pixel (XOR operation).
-                    Screen[idx] = !Screen[idx];
+                    V[0xF] = 0x01;
                 }
 
-                // Shift the next bit in from the right.
-                sprite <<= 1;
+                // Enable or disable the pixel (XOR operation).
+                Screen[pixelIndex] = !Screen[pixelIndex];
             }
         }
+    }
+
+    /// <summary>
+    /// Parse one out of the `n` 8-bit segments of a sprite.
+    /// </summary>
+    private static bool[] ParseSpritePart(byte spritePart)
+    {
+        // Each bit in the sprite part is a pixel on or off.
+        var pixelIsOn = new bool[8];
+
+        for (int i = 0; i < pixelIsOn.Length; i++)
+        {
+            // Start with the current most significant bit.
+            pixelIsOn[i] = (spritePart & 0b1000_0000) != 0;
+
+            // Shift the next bit in from the right.
+            spritePart <<= 1;
+        }
+
+        return pixelIsOn;
     }
 
     /// <summary>
