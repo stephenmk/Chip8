@@ -10,6 +10,8 @@ public class VirtualMachine
 {
     public bool VfResetQuirk { get; init; } = true;
     public bool MemoryQuirk { get; init; } = true;
+    public bool DisplayWaitQuirk { get; init; } = true;
+    public bool ClippingQuirk { get; init; } = true;
     public bool ShiftingQuirk { get; init; } = false;
     public bool JumpingQuirk { get; init; } = false;
 
@@ -140,7 +142,7 @@ public class VirtualMachine
                 _state.OpCodeCXNN(x, nn);
                 break;
             case 0xD000:
-                _state.OpCodeDXYN(x, y, n);
+                _state.OpCodeDXYN(x, y, n, DisplayWaitQuirk, ClippingQuirk);
                 UpdateScreen();
                 break;
             case 0xE000 when nn == 0x9E:

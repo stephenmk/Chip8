@@ -181,7 +181,7 @@ internal class State
     /// <remarks>
     /// Usually the next instruction is a jump to skip a code block.
     /// </remarks>
-    public void OpCode3XNN(byte x, ushort nn)
+    public void OpCode3XNN(byte x, byte nn)
     {
         if (V[x] == nn)
         {
@@ -195,7 +195,7 @@ internal class State
     /// <remarks>
     /// Usually the next instruction is a jump to skip a code block.
     /// </remarks>
-    public void OpCode4XNN(byte x, ushort nn)
+    public void OpCode4XNN(byte x, byte nn)
     {
         if (V[x] != nn)
         {
@@ -220,9 +220,9 @@ internal class State
     /// <summary>
     /// Sets Vx to NN.
     /// </summary>
-    public void OpCode6XNN(byte x, ushort nn)
+    public void OpCode6XNN(byte x, byte nn)
     {
-        V[x] = (byte)nn;
+        V[x] = nn;
     }
 
     /// <summary>
@@ -405,7 +405,7 @@ internal class State
     /// <remarks>
     /// Source: https://stackoverflow.com/questions/17346592/how-does-chip-8-graphics-rendered-on-screen
     /// </remarks>
-    public void OpCodeDXYN(byte X, byte Y, byte N)
+    public void OpCodeDXYN(byte x, byte y, byte n, bool _, bool clippingQuirk)
     {
         // Initialize the collision detection as no collision detected (yet).
         V[0xF] = 0;
@@ -423,7 +423,7 @@ internal class State
             for (int column = 0; column < 8; column++)
             {
                 // Start with the current most significant bit. The next bit will be left shifted in from the right.
-                if ((sprite & 0x80) != 0)
+                if ((sprite & 0b1000_0000) != 0)
                 {
                     // Get the current x position and wrap around if needed.
                     var x = (V[X] + column) % 64;
@@ -440,7 +440,7 @@ internal class State
                 }
 
                 // Shift the next bit in from the right.
-                sprite <<= 0x1;
+                sprite <<= 1;
             }
         }
     }
