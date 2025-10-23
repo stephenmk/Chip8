@@ -8,6 +8,11 @@ namespace Chip8;
 
 public class VirtualMachine
 {
+    public bool VfResetQuirk { get; init; } = true;
+    public bool MemoryQuirk { get; init; } = true;
+    public bool ShiftingQuirk { get; init; } = false;
+    public bool JumpingQuirk { get; init; } = false;
+
     private readonly ImmutableArray<byte> Fonts =
     [
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -99,13 +104,13 @@ public class VirtualMachine
                 _state.OpCode8XY0(x, y);
                 break;
             case 0x8000 when n == 0x1:
-                _state.OpCode8XY1(x, y);
+                _state.OpCode8XY1(x, y, VfResetQuirk);
                 break;
             case 0x8000 when n == 0x2:
-                _state.OpCode8XY2(x, y);
+                _state.OpCode8XY2(x, y, VfResetQuirk);
                 break;
             case 0x8000 when n == 0x3:
-                _state.OpCode8XY3(x, y);
+                _state.OpCode8XY3(x, y, VfResetQuirk);
                 break;
             case 0x8000 when n == 0x4:
                 _state.OpCode8XY4(x, y);
@@ -114,13 +119,13 @@ public class VirtualMachine
                 _state.OpCode8XY5(x, y);
                 break;
             case 0x8000 when n == 0x6:
-                _state.OpCode8XY6(x, y);
+                _state.OpCode8XY6(x, y, ShiftingQuirk);
                 break;
             case 0x8000 when n == 0x7:
                 _state.OpCode8XY7(x, y);
                 break;
             case 0x8000 when n == 0xE:
-                _state.OpCode8XYE(x, y);
+                _state.OpCode8XYE(x, y, ShiftingQuirk);
                 break;
             case 0x9000:
                 _state.OpCode9XY0(x, y);
@@ -129,7 +134,7 @@ public class VirtualMachine
                 _state.OpCodeANNN(nnn);
                 break;
             case 0xB000:
-                _state.OpCodeBNNN(nnn);
+                _state.OpCodeBNNN(nnn, JumpingQuirk);
                 break;
             case 0xC000:
                 _state.OpCodeCXNN(x, nn);
@@ -166,10 +171,10 @@ public class VirtualMachine
                 _state.OpCodeFX33(x);
                 break;
             case 0xF000 when nn == 0x55:
-                _state.OpCodeFX55(x);
+                _state.OpCodeFX55(x, MemoryQuirk);
                 break;
             case 0xF000 when nn == 0x65:
-                _state.OpCodeFX65(x);
+                _state.OpCodeFX65(x, MemoryQuirk);
                 break;
             default:
                 throw new InvalidOperationException($"Invalid OpCode {opCode:X4}");

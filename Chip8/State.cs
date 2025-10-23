@@ -244,7 +244,7 @@ internal class State
     /// <summary>
     /// Sets Vx to Vx or Vy (bitwise OR operation).
     /// </summary>
-    public void OpCode8XY1(byte x, byte y, bool quirk = true)
+    public void OpCode8XY1(byte x, byte y, bool quirk)
     {
         V[x] = (byte)(V[x] | V[y]);
         if (quirk)
@@ -256,7 +256,7 @@ internal class State
     /// <summary>
     /// Sets Vx to Vx and Vy (bitwise AND operation).
     /// </summary>
-    public void OpCode8XY2(byte x, byte y, bool quirk = true)
+    public void OpCode8XY2(byte x, byte y, bool quirk)
     {
         V[x] = (byte)(V[x] & V[y]);
         if (quirk)
@@ -268,7 +268,7 @@ internal class State
     /// <summary>
     /// Sets Vx to Vx xor Vy.
     /// </summary>
-    public void OpCode8XY3(byte x, byte y, bool quirk = true)
+    public void OpCode8XY3(byte x, byte y, bool quirk)
     {
         V[x] = (byte)(V[x] ^ V[y]);
         if (quirk)
@@ -307,14 +307,14 @@ internal class State
     /// Note that x is allowed to be F, and the assignment to VF must
     /// be done after the assignment to Vx.
     /// </remarks>
-    public void OpCode8XY6(byte x, byte y, bool quirk = false)
+    public void OpCode8XY6(byte x, byte y, bool quirk)
     {
         if (!quirk)
         {
             V[x] = V[y];
         }
         byte leastSigBit = (byte)(V[x] & 0b0000_0001);
-        V[x] >>= 0x01;
+        V[x] >>= 1;
         V[0xF] = leastSigBit;
     }
 
@@ -337,14 +337,14 @@ internal class State
     /// Note that x is allowed to be F, and the assignment to VF must
     /// be done after the assignment to Vx.
     /// </remarks>
-    public void OpCode8XYE(byte x, byte y, bool quirk = false)
+    public void OpCode8XYE(byte x, byte y, bool quirk)
     {
         if (!quirk)
         {
             V[x] = V[y];
         }
         bool isMostSigBitSet = (V[x] & 0b1000_0000) == 0b1000_0000;
-        V[x] <<= 0x01;
+        V[x] <<= 1;
         V[0xF] = (byte)(isMostSigBitSet ? 0x01 : 0x00);
     }
 
@@ -376,7 +376,7 @@ internal class State
     /// <remarks>
     /// https://tobiasvl.github.io/blog/write-a-chip-8-emulator/#bnnn-jump-with-offset
     /// </remarks>
-    public void OpCodeBNNN(ushort nnn, bool quirk = false)
+    public void OpCodeBNNN(ushort nnn, bool quirk)
     {
         if (quirk)
         {
@@ -553,7 +553,7 @@ internal class State
     /// The offset from I is increased by 1 for each value written, but I itself is left unmodified.
     /// Due to a quirk, I is left pointing to the address following the last one read into a variable.
     /// </remarks>
-    public void OpCodeFX55(byte x, bool quirk = true)
+    public void OpCodeFX55(byte x, bool quirk)
     {
         for (int i = 0; i <= x; i++)
         {
@@ -572,7 +572,7 @@ internal class State
     /// The offset from I is increased by 1 for each value read, but I itself is left unmodified.
     /// Due to a quirk, I is left pointing to the address following the last one read into a variable.
     /// </remarks>
-    public void OpCodeFX65(byte x, bool quirk = true)
+    public void OpCodeFX65(byte x, bool quirk)
     {
         for (int i = 0; i <= x; i++)
         {
