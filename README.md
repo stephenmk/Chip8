@@ -1,17 +1,25 @@
 # Chip-8
-A CHIP-8 emulator written in C# (.NET 9.0)
+A CHIP-8 interpreter written in C# (.NET 9.0)
 
 https://github.com/user-attachments/assets/89a3885f-59dc-465d-9e16-8ddaf357cff8
 
 *Roms/invaders.ch8*
 
-> "CHIP-8 is an interpreted programming language, developed by Joseph Weisbecker. It was initially used on the COSMAC VIP and Telmac 1800 8-bit microcomputers in the mid-1970s. CHIP-8 programs are run on a CHIP-8 virtual machine. It was made to allow video games to be more easily programmed for these computers." — Wikipedia
+This repo is forked from [ronazulay/Chip8](https://github.com/ronazulay/Chip8).
+I added the following features:
 
-This chip8 emulator was written by [@ronazulay](https://github.com/ronazulay) in 2020.
-See [the readme](https://github.com/ronazulay/Chip8) in his repo for more information.
+* Updated to .NET 9.0 from .NET Core 3.1
+* Updated to OpenGL4 from legacy OpenGL.
+* Added a visual bell (flashing screen) effect.
+* Implemented [Timendus's chip8 test suite v4.2](https://github.com/Timendus/chip8-test-suite) (work in progress)
+    * Fixed various bugs to pass the `corax+` and `flags` tests
+    * Added new features to pass the `quirks` tests
 
-I updated the program to target .NET 9.0 and the latest version of the OpenTK library.
-I also refactored and tidied up the program to make it a little more object-oriented.
+## To do
+* Pass Timendus `keypad` and `beep` tests.
+* Add implementation for Super Chip-8
+* Add implementation for XO-CHIP
+* Improve UI, add file menus and customizable keybinds, etc.
 
 ## Running
 
