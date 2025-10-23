@@ -25,7 +25,8 @@ public class Window : GameWindow, IChip8Window
 
     public void LoadRom(string romPath)
     {
-        _virtualMachine = new(this, romPath, new Quirks(), 1200);
+        var romBytes = File.ReadAllBytes(romPath);
+        _virtualMachine = new(this, romBytes, new Quirks(), 1200);
         _debugger = new(_virtualMachine);
         _isRunning = true;
     }

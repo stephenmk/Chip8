@@ -33,9 +33,6 @@ public class VirtualMachine
     private readonly Quirks _quirks;
     private readonly int _ips;  // Instructions per second
 
-    public VirtualMachine(IChip8Window? window, string romPath, Quirks quirks = default, int ips = 600)
-        : this(window, File.ReadAllBytes(romPath), quirks, ips) { }
-
     public VirtualMachine(IChip8Window? window, byte[] rom, Quirks quirks = default, int ips = 600)
     {
         _window = window;

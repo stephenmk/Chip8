@@ -32,8 +32,8 @@ internal static class TestMethods
 
     public static void TestScreen(string romFilename, uint cycles, string screenFilename)
     {
-        var romPath = Path.Join("Timendus-chip8-test-suite", romFilename);
-        var vm = new VirtualMachine(null, romPath);
+        var romBytes = File.ReadAllBytes(Path.Join("Timendus-chip8-test-suite", romFilename));
+        var vm = new VirtualMachine(null, romBytes);
         vm.Cycle(cycles);
         var state = vm.Snapshot();
 
