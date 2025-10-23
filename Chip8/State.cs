@@ -96,7 +96,7 @@ internal class State
         OpCode00E0();  // Clear screen
     }
 
-    public ushort NextOpCode()
+    public ushort NextInstruction()
     {
         if (!Blocked)
         {

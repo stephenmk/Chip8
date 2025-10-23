@@ -55,9 +55,9 @@ public class VirtualMachine
 
     private void Cycle()
     {
-        var opCode = _state.NextOpCode();
+        var opCode = _state.NextInstruction();
 
-        ushort nnn = (ushort)(opCode & 0x0FFF);   // Address
+        ushort nnn = (ushort)(opCode & 0x0FFF);   // 12-bit address
         byte nn = (byte)(opCode & 0x00FF);        // 8-bit constant
         byte n = (byte)(opCode & 0x000F);         // 4-bit constant
         byte x = (byte)((opCode & 0x0F00) >> 8);  // 4-bit register identifier
@@ -95,31 +95,31 @@ public class VirtualMachine
             case 0x7000:
                 _state.OpCode7XNN(x, nn);
                 break;
-            case 0x8000 when (opCode & 0x000F) == 0:
+            case 0x8000 when n == 0x0:
                 _state.OpCode8XY0(x, y);
                 break;
-            case 0x8000 when (opCode & 0x000F) == 1:
+            case 0x8000 when n == 0x1:
                 _state.OpCode8XY1(x, y);
                 break;
-            case 0x8000 when (opCode & 0x000F) == 2:
+            case 0x8000 when n == 0x2:
                 _state.OpCode8XY2(x, y);
                 break;
-            case 0x8000 when (opCode & 0x000F) == 3:
+            case 0x8000 when n == 0x3:
                 _state.OpCode8XY3(x, y);
                 break;
-            case 0x8000 when (opCode & 0x000F) == 4:
+            case 0x8000 when n == 0x4:
                 _state.OpCode8XY4(x, y);
                 break;
-            case 0x8000 when (opCode & 0x000F) == 5:
+            case 0x8000 when n == 0x5:
                 _state.OpCode8XY5(x, y);
                 break;
-            case 0x8000 when (opCode & 0x000F) == 6:
+            case 0x8000 when n == 0x6:
                 _state.OpCode8XY6(x, y);
                 break;
-            case 0x8000 when (opCode & 0x000F) == 7:
+            case 0x8000 when n == 0x7:
                 _state.OpCode8XY7(x, y);
                 break;
-            case 0x8000 when (opCode & 0x000F) == 0xE:
+            case 0x8000 when n == 0xE:
                 _state.OpCode8XYE(x, y);
                 break;
             case 0x9000:
@@ -138,37 +138,37 @@ public class VirtualMachine
                 _state.OpCodeDXYN(x, y, n);
                 UpdateScreen();
                 break;
-            case 0xE000 when (opCode & 0x00FF) == 0x9E:
+            case 0xE000 when nn == 0x9E:
                 _state.OpCodeEX9E(x);
                 break;
-            case 0xE000 when (opCode & 0x00FF) == 0xA1:
+            case 0xE000 when nn == 0xA1:
                 _state.OpCodeEXA1(x);
                 break;
-            case 0xF000 when (opCode & 0x00FF) == 0x07:
+            case 0xF000 when nn == 0x07:
                 _state.OpCodeFX07(x);
                 break;
-            case 0xF000 when (opCode & 0x00FF) == 0x0A:
+            case 0xF000 when nn == 0x0A:
                 _state.OpCodeFX0A(x);
                 break;
-            case 0xF000 when (opCode & 0x00FF) == 0x15:
+            case 0xF000 when nn == 0x15:
                 _state.OpCodeFX15(x);
                 break;
-            case 0xF000 when (opCode & 0x00FF) == 0x18:
+            case 0xF000 when nn == 0x18:
                 _state.OpCodeFX18(x);
                 break;
-            case 0xF000 when (opCode & 0x00FF) == 0x1E:
+            case 0xF000 when nn == 0x1E:
                 _state.OpCodeFX1E(x);
                 break;
-            case 0xF000 when (opCode & 0x00FF) == 0x29:
+            case 0xF000 when nn == 0x29:
                 _state.OpCodeFX29(x);
                 break;
-            case 0xF000 when (opCode & 0x00FF) == 0x33:
+            case 0xF000 when nn == 0x33:
                 _state.OpCodeFX33(x);
                 break;
-            case 0xF000 when (opCode & 0x00FF) == 0x55:
+            case 0xF000 when nn == 0x55:
                 _state.OpCodeFX55(x);
                 break;
-            case 0xF000 when (opCode & 0x00FF) == 0x65:
+            case 0xF000 when nn == 0x65:
                 _state.OpCodeFX65(x);
                 break;
             default:
