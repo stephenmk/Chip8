@@ -12,7 +12,7 @@ public readonly ref struct StateSnapshot
     public ushort OpCode { get; init; }
     public ushort MemoryAddress { get; init; }
     public ushort ProgramCounter { get; init; }
-    public ushort StackPointer { get; init; }
+    public byte StackPointer { get; init; }
     public bool Beep { get; init; }
     public bool Blocked { get; init; }
     public byte DelayTimer { get; init; }

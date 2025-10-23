@@ -11,14 +11,14 @@ internal class State
 
     private ushort OpCode;
     private ushort I;  // 12bit register (for memory address)
-    private ushort PC;  // Program Counter
-    private ushort SP;  // Stack Pointer
+    private ushort PC;  // 12bit Program Counter
+    private byte SP;  // 8bit Stack Pointer
 
     private bool Beep;
     private bool Blocked;
     private byte DelayTimer;
     private byte SoundTimer;
-    private ushort CycleCount;
+    private byte CycleCount;
     private UInt128 InstructionCycles;
 
     private readonly byte[] V;  // Register variables (16 available, 0 to F)
@@ -30,9 +30,9 @@ internal class State
     public State(IList<byte> font, IList<byte> rom)
     {
         OpCode = 0x0000;
-        I = 0;
+        I = 0x000;
         PC = RomStart;
-        SP = 0;
+        SP = 0x0;
 
         Blocked = false;
         DelayTimer = 0;
@@ -40,7 +40,7 @@ internal class State
         CycleCount = 0;
         InstructionCycles = 0;
 
-        Stack = new ushort[12];
+        Stack = new ushort[16];
         Memory = new byte[4096];
         Screen = new bool[64 * 32];
         V = new byte[16];
@@ -85,9 +85,9 @@ internal class State
     public void Reset()
     {
         OpCode = 0x0000;
-        I = 0;
+        I = 0x000;
         PC = RomStart;
-        SP = 0;
+        SP = 0x0;
         Blocked = false;
         DelayTimer = 0;
         SoundTimer = 0;
