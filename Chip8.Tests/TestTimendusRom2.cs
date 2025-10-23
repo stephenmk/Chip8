@@ -11,38 +11,13 @@ public class TestTimendusRom2
     private const string RomFilename = "2-ibm-logo.ch8";
 
     [TestMethod]
-    public void Test_2_ibm_logo_cycle01()
+    public void Test_2_ibm_logo_loading()
     {
         Test_2_ibm_logo_cycle_range(start: 1, count: 4);
-    }
-
-    [TestMethod]
-    public void Test_2_ibm_logo_cycle05()
-    {
         Test_2_ibm_logo_cycle_range(start: 5, count: 3);
-    }
-
-    [TestMethod]
-    public void Test_2_ibm_logo_cycle08()
-    {
         Test_2_ibm_logo_cycle_range(start: 8, count: 3);
-    }
-
-    [TestMethod]
-    public void Test_2_ibm_logo_cycle11()
-    {
         Test_2_ibm_logo_cycle_range(start: 11, count: 3);
-    }
-
-    [TestMethod]
-    public void Test_2_ibm_logo_cycle14()
-    {
         Test_2_ibm_logo_cycle_range(start: 14, count: 3);
-    }
-
-    [TestMethod]
-    public void Test_2_ibm_logo_cycle17()
-    {
         Test_2_ibm_logo_cycle_range(start: 17, count: 3);
     }
 
