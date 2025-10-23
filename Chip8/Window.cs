@@ -25,7 +25,7 @@ public class Window : GameWindow, IChip8Window
 
     public void LoadRom(string romPath)
     {
-        _virtualMachine = new(this, romPath);
+        _virtualMachine = new(this, romPath, new Quirks(), 1200);
         _debugger = new(_virtualMachine);
         _isRunning = true;
     }
@@ -42,9 +42,7 @@ public class Window : GameWindow, IChip8Window
         base.OnUpdateFrame(e);
         if (_isRunning)
         {
-            // VM runs at 600Hz; window update frames at 300Hz.
-            // Therefore cycle the VM twice per frame update.
-            _virtualMachine?.Cycle(2);
+            _virtualMachine?.CycleFrame();
         }
     }
 

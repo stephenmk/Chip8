@@ -8,6 +8,7 @@ namespace Chip8;
 internal class State
 {
     private const ushort RomStart = 0x200;
+    private readonly int InstructionsPerTimerCycle;
 
     private ushort OpCode;
     private ushort I;  // 12bit register (for memory address)
@@ -16,10 +17,12 @@ internal class State
 
     private bool Beep;
     private bool Blocked;
+    private bool DisplayWait;
     private byte DelayTimer;
     private byte SoundTimer;
-    private byte CycleCount;
-    private UInt128 InstructionCycles;
+
+    private int TimerCycleCount;
+    private UInt128 InstructionsProcessed;
 
     private readonly byte[] V;  // Register variables (16 available, 0 to F)
     private readonly byte[] Memory;
@@ -27,18 +30,22 @@ internal class State
     private readonly ushort[] Stack;
     private readonly bool[] Keys;  // Pressed keys, ranging from 0 to F.
 
-    public State(IList<byte> font, IList<byte> rom)
+    public State(int instructionsPerSecond, IList<byte> font, IList<byte> rom)
     {
+        // Timers should be updated 60 times per second (60 Hz).
+        InstructionsPerTimerCycle = instructionsPerSecond / 60;
+
         OpCode = 0x0000;
         I = 0x000;
         PC = RomStart;
         SP = 0x0;
 
         Blocked = false;
+        DisplayWait = false;
         DelayTimer = 0;
         SoundTimer = 0;
-        CycleCount = 0;
-        InstructionCycles = 0;
+        TimerCycleCount = 0;
+        InstructionsProcessed = 0;
 
         Stack = new ushort[16];
         Memory = new byte[4096];
@@ -61,10 +68,11 @@ internal class State
         StackPointer = SP,
         Beep = Beep,
         Blocked = Blocked,
+        DisplayWait = DisplayWait,
         DelayTimer = DelayTimer,
         SoundTimer = SoundTimer,
-        CycleCount = CycleCount,
-        InstructionCycles = InstructionCycles,
+        TimerCycleCount = TimerCycleCount,
+        InstructionsProcessed = InstructionsProcessed,
         Stack = Stack.AsSpan(),
         Variables = V.AsSpan(),
         Memory = Memory.AsSpan(),
@@ -90,10 +98,11 @@ internal class State
         SP = 0x0;
         Beep = false;
         Blocked = false;
+        DisplayWait = false;
         DelayTimer = 0;
         SoundTimer = 0;
-        CycleCount = 0;
-        InstructionCycles = 0;
+        TimerCycleCount = 0;
+        InstructionsProcessed = 0;
         OpCode00E0();  // Clear screen
     }
 
@@ -108,16 +117,16 @@ internal class State
     }
 
     /// <remarks>
-    /// The update frequency is 600 Hz. Timers should be
-    /// updated at 60 Hz, so update timers every 10th cycle.
+    /// Timers should be updated 60 times per second (60 Hz).
     /// </remarks>
     /// <returns><c>true</c> if beeping, otherwise <c>false</c>.</returns>
     public bool UpdateTimers()
     {
-        InstructionCycles++;
-        if ((++CycleCount % 10) == 0)
+        InstructionsProcessed++;
+        if ((++TimerCycleCount % InstructionsPerTimerCycle) == 0)
         {
-            CycleCount = 0;
+            DisplayWait = false;
+            TimerCycleCount = 0;
             if (DelayTimer > 0)
             {
                 DelayTimer--;
@@ -406,8 +415,19 @@ internal class State
     /// <remarks>
     /// https://www.laurencescotford.net/2020/07/19/chip-8-on-the-cosmac-vip-drawing-sprites/
     /// </remarks>
-    public void OpCodeDXYN(byte x, byte y, byte n, bool _, bool clippingQuirk)
+    public void OpCodeDXYN(byte x, byte y, byte n, bool displayWaitQuirk, bool clippingQuirk)
     {
+        if (displayWaitQuirk && DisplayWait)
+        {
+            Blocked = true;
+            return;
+        }
+        else
+        {
+            Blocked = false;
+            DisplayWait = true;
+        }
+
         // Initialize the collision detection as no collision detected (yet).
         V[0xF] = 0x00;
 

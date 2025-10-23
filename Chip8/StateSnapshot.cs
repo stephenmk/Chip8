@@ -15,10 +15,11 @@ public readonly ref struct StateSnapshot
     public byte StackPointer { get; init; }
     public bool Beep { get; init; }
     public bool Blocked { get; init; }
+    public bool DisplayWait { get; init; }
     public byte DelayTimer { get; init; }
     public byte SoundTimer { get; init; }
-    public ushort CycleCount { get; init; }
-    public UInt128 InstructionCycles { get; init; }
+    public int TimerCycleCount { get; init; }
+    public UInt128 InstructionsProcessed { get; init; }
     public ReadOnlySpan<ushort> Stack { get; init; }
     public ReadOnlySpan<byte> Variables { get; init; }
     public ReadOnlySpan<byte> Memory { get; init; }

@@ -12,4 +12,5 @@ public interface IChip8Window
     void StartBeep();
     void EndBeep();
     void UpdateScreen(IList<bool> screen);
+    double UpdateFrequency { get; set; }
 }

@@ -8,13 +8,6 @@ namespace Chip8;
 
 public class VirtualMachine
 {
-    public bool VfResetQuirk { get; init; } = true;
-    public bool MemoryQuirk { get; init; } = true;
-    public bool DisplayWaitQuirk { get; init; } = true;
-    public bool ClippingQuirk { get; init; } = true;
-    public bool ShiftingQuirk { get; init; } = false;
-    public bool JumpingQuirk { get; init; } = false;
-
     private readonly ImmutableArray<byte> Fonts =
     [
         0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -35,22 +28,37 @@ public class VirtualMachine
         0xF0, 0x80, 0xF0, 0x80, 0x80, // F
     ];
 
-    private readonly State _state;
     private readonly IChip8Window? _window;
+    private readonly State _state;
+    private readonly Quirks _quirks;
+    private readonly int _ips;
 
-    public VirtualMachine(IChip8Window? window, string romPath)
-        : this(window, File.ReadAllBytes(romPath)) { }
+    public VirtualMachine(IChip8Window? window, string romPath, Quirks quirks = default, int ips = 600)
+        : this(window, File.ReadAllBytes(romPath), quirks, ips) { }
 
-    public VirtualMachine(IChip8Window? window, byte[] rom)
+    public VirtualMachine(IChip8Window? window, byte[] rom, Quirks quirks = default, int ips = 600)
     {
         _window = window;
-        _state = new State(Fonts, rom);
+        _quirks = quirks;
+        _state = new State(ips, Fonts, rom);
+        _ips = ips;
     }
 
     public StateSnapshot Snapshot() => _state.Snapshot();
     public void KeyUp(byte key) => _state.UnsetKey(key);
     public void KeyDown(byte key) => _state.SetKey(key);
     public void Reset() => _state.Reset();
+
+    public void CycleFrame()
+    {
+        if (_window is null)
+        {
+            throw new InvalidOperationException();
+        }
+        uint times = (uint)(_ips / _window?.UpdateFrequency)!;
+        Console.WriteLine(times);
+        Cycle(times);
+    }
 
     public void Cycle(uint times)
     {
@@ -106,13 +114,13 @@ public class VirtualMachine
                 _state.OpCode8XY0(x, y);
                 break;
             case 0x8000 when n == 0x1:
-                _state.OpCode8XY1(x, y, VfResetQuirk);
+                _state.OpCode8XY1(x, y, _quirks.VfReset);
                 break;
             case 0x8000 when n == 0x2:
-                _state.OpCode8XY2(x, y, VfResetQuirk);
+                _state.OpCode8XY2(x, y, _quirks.VfReset);
                 break;
             case 0x8000 when n == 0x3:
-                _state.OpCode8XY3(x, y, VfResetQuirk);
+                _state.OpCode8XY3(x, y, _quirks.VfReset);
                 break;
             case 0x8000 when n == 0x4:
                 _state.OpCode8XY4(x, y);
@@ -121,13 +129,13 @@ public class VirtualMachine
                 _state.OpCode8XY5(x, y);
                 break;
             case 0x8000 when n == 0x6:
-                _state.OpCode8XY6(x, y, ShiftingQuirk);
+                _state.OpCode8XY6(x, y, _quirks.Shifting);
                 break;
             case 0x8000 when n == 0x7:
                 _state.OpCode8XY7(x, y);
                 break;
             case 0x8000 when n == 0xE:
-                _state.OpCode8XYE(x, y, ShiftingQuirk);
+                _state.OpCode8XYE(x, y, _quirks.Shifting);
                 break;
             case 0x9000:
                 _state.OpCode9XY0(x, y);
@@ -136,13 +144,13 @@ public class VirtualMachine
                 _state.OpCodeANNN(nnn);
                 break;
             case 0xB000:
-                _state.OpCodeBNNN(nnn, JumpingQuirk);
+                _state.OpCodeBNNN(nnn, _quirks.Jumping);
                 break;
             case 0xC000:
                 _state.OpCodeCXNN(x, nn);
                 break;
             case 0xD000:
-                _state.OpCodeDXYN(x, y, n, DisplayWaitQuirk, ClippingQuirk);
+                _state.OpCodeDXYN(x, y, n, _quirks.DisplayWait, _quirks.Clipping);
                 UpdateScreen();
                 break;
             case 0xE000 when nn == 0x9E:
@@ -173,10 +181,10 @@ public class VirtualMachine
                 _state.OpCodeFX33(x);
                 break;
             case 0xF000 when nn == 0x55:
-                _state.OpCodeFX55(x, MemoryQuirk);
+                _state.OpCodeFX55(x, _quirks.Memory);
                 break;
             case 0xF000 when nn == 0x65:
-                _state.OpCodeFX65(x, MemoryQuirk);
+                _state.OpCodeFX65(x, _quirks.Memory);
                 break;
             default:
                 throw new InvalidOperationException($"Invalid OpCode {opCode:X4}");
