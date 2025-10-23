@@ -37,6 +37,11 @@ public class TestTimendusRom5
         Test(quirks, 1200, "5-quirks-all-on.txt");
     }
 
+    /// <remarks>
+    /// The `DisplayWait` quirk requires a higher instruction rate (ips) because
+    /// the machine is limited to drawing 60 pixels per second. The thread blocks
+    /// when the limit is reached, and many cycles are spent doing nothing but waiting.
+    /// </remarks>
     private static void Test(Quirks quirks, int ips, string expectedScreenFilename)
     {
         var romBytes = TimendusRomBytes("5-quirks.ch8");
