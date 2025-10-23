@@ -417,15 +417,18 @@ internal class State
     /// </remarks>
     public void OpCodeDXYN(byte x, byte y, byte n, bool displayWaitQuirk, bool clippingQuirk)
     {
-        if (displayWaitQuirk && DisplayWait)
+        if (displayWaitQuirk)
         {
-            Blocked = true;
-            return;
-        }
-        else
-        {
-            Blocked = false;
-            DisplayWait = true;
+            if (DisplayWait)
+            {
+                Blocked = true;
+                return;
+            }
+            else
+            {
+                Blocked = false;
+                DisplayWait = true;
+            }
         }
 
         // Initialize the collision detection as no collision detected (yet).
