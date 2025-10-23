@@ -59,9 +59,6 @@ public class TestTimendusRom5
         var expectedScreen = ExpectedScreen(expectedScreenFilename);
         var actualScreen = state.Screen.ToArray();
 
-        var debugger = new Debugger(vm);
-        debugger.PrintScreen();
-
         CollectionAssert.AreEqual(expectedScreen, actualScreen);
     }
 }
