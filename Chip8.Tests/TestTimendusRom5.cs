@@ -39,7 +39,7 @@ public class TestTimendusRom5
 
     /// <remarks>
     /// The `DisplayWait` quirk requires a higher instruction rate (ips) because
-    /// the machine is limited to drawing 60 pixels per second. The thread blocks
+    /// the machine is limited to drawing 1 sprite per frame (at 60 FPS). The thread blocks
     /// when the limit is reached, and many cycles are spent doing nothing but waiting.
     /// </remarks>
     private static void Test(Quirks quirks, int ips, string expectedScreenFilename)
