@@ -66,9 +66,9 @@ public class VirtualMachine
 
         ushort nnn = (ushort)(opCode & 0x0FFF);   // 12-bit address
         byte nn = (byte)(opCode & 0x00FF);        // 8-bit constant
-        byte n = (byte)(opCode & 0x000F);         // 4-bit constant
         byte x = (byte)((opCode & 0x0F00) >> 8);  // 4-bit register identifier
         byte y = (byte)((opCode & 0x00F0) >> 4);  // 4-bit register identifier
+        byte n = (byte)((opCode & 0x000F) >> 0);  // 4-bit constant
 
         switch (opCode & 0xF000)
         {

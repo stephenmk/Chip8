@@ -427,7 +427,7 @@ internal class State
             byte spritePart = Memory[I + line];
 
             // Each bit in the sprite is a pixel on or off.
-            var pixelIsOn = ParseSpritePart(spritePart);
+            bool[] pixelIsOn = ParseSpritePart(spritePart);
 
             for (int column = 0; column < pixelIsOn.Length; column++)
             {
