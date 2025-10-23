@@ -21,7 +21,7 @@ internal class State
     private ushort CycleCount;
     private UInt128 InstructionCycles;
 
-    private readonly byte[] V;  // Variables (16 available, 0 to F)
+    private readonly byte[] V;  // Register variables (16 available, 0 to F)
     private readonly byte[] Memory;
     private readonly bool[] Screen;
     private readonly ushort[] Stack;
@@ -47,7 +47,7 @@ internal class State
         Keys = new bool[16];
 
         // Load fonts.
-        font.CopyTo(Memory, 0x0);
+        font.CopyTo(Memory, 0);
 
         // Load ROM.
         rom.CopyTo(Memory, RomStart);
@@ -373,9 +373,20 @@ internal class State
     /// <summary>
     /// Jumps to the address NNN plus V0.
     /// </summary>
-    public void OpCodeBNNN(ushort nnn)
+    /// <remarks>
+    /// https://tobiasvl.github.io/blog/write-a-chip-8-emulator/#bnnn-jump-with-offset
+    /// </remarks>
+    public void OpCodeBNNN(ushort nnn, bool quirk = false)
     {
-        PC = (ushort)(nnn + V[0x0]);
+        if (quirk)
+        {
+            byte x = (byte)((nnn & 0xF00) >> 8);
+            PC = (ushort)(nnn + V[x]);
+        }
+        else
+        {
+            PC = (ushort)(nnn + V[0x0]);
+        }
     }
 
     /// <summary>
