@@ -429,20 +429,16 @@ internal class State
             // Each bit in the sprite is a pixel on or off.
             var pixelIsOn = ParseSpritePart(spritePart);
 
-            for (int column = 0; column < 8; column++)
+            for (int column = 0; column < pixelIsOn.Length; column++)
             {
-                if (!pixelIsOn[column])
-                    continue;
-
                 // Get the current x position and wrap around if needed.
                 int startingX = clippingQuirk ? V[x] % 64 : V[x];
 
                 if (clippingQuirk && (startingX + column >= 64))
                     continue;
 
-                var screenX = (startingX + column) % 64;
-
-                var pixelIndex = screenY * 64 + screenX;
+                int screenX = (startingX + column) % 64;
+                int pixelIndex = screenY * 64 + screenX;
 
                 // Collision detection: If the target pixel is already set,
                 // then set the collision detection flag in register VF.
@@ -452,7 +448,7 @@ internal class State
                 }
 
                 // Enable or disable the pixel (XOR operation).
-                Screen[pixelIndex] = !Screen[pixelIndex];
+                Screen[pixelIndex] ^= pixelIsOn[column];
             }
         }
     }
