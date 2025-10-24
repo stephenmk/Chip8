@@ -90,6 +90,11 @@ internal class State
         Keys[key] = false;
     }
 
+    /// <remarks>
+    /// TODO: Reset the ROM as well.
+    /// "All the memory is RAM and should be considered to be writable. CHIP-8 games can, and do, modify themselves."
+    /// https://tobiasvl.github.io/blog/write-a-chip-8-emulator/
+    /// </remarks>
     public void Reset()
     {
         OpCode = 0x0000;
